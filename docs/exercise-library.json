@@ -1,0 +1,942 @@
+{
+  "version": 1,
+  "about": "Seed data for the Kumite exercises table. Each ladder lists exercises from easiest to hardest by rung. The engine moves up a ladder when load and reps are maxed out (see PLAN.md, Engine rules).",
+  "units": {
+    "load": "pounds per dumbbell",
+    "reps": "per side for unilateral exercises",
+    "seconds": "per side for side planks",
+    "dumbbells": "how many dumbbells the exercise uses (0, 1, or 2)"
+  },
+  "groups": {
+    "push": "chest, shoulders, triceps (weekly target)",
+    "pull": "back, biceps (weekly target)",
+    "squat": "quads (weekly target)",
+    "hinge": "glutes, hamstrings (weekly target)",
+    "core": "tracked, no weekly target",
+    "arms": "tracked, no weekly target"
+  },
+  "templates": {
+    "A": {
+      "pairs": [
+        [
+          "pullup",
+          "rdl"
+        ],
+        [
+          "unilateral_squat",
+          "bench"
+        ]
+      ],
+      "finisher": "core_front",
+      "optional_finisher": [
+        "curl",
+        "triceps"
+      ]
+    },
+    "B": {
+      "pairs": [
+        [
+          "box_squat",
+          "shoulder_press"
+        ],
+        [
+          "row",
+          "hip_thrust"
+        ]
+      ],
+      "finisher": "core_side",
+      "optional_finisher": [
+        "curl",
+        "triceps"
+      ]
+    }
+  },
+  "knee_swaps": {
+    "A": {
+      "unilateral_squat": "hip_thrust"
+    },
+    "B": {
+      "box_squat": "rdl"
+    },
+    "desk": {
+      "chair_squat": "glute_bridge"
+    }
+  },
+  "ladders": {
+    "pullup": {
+      "group": "pull",
+      "progression": "pullup_stages",
+      "note": "Stages and band steps are defined in PLAN.md. pullup_negative is the Stage 1 accessory."
+    },
+    "pullup_accessory": {
+      "group": "pull",
+      "progression": "none"
+    },
+    "rdl": {
+      "group": "hinge",
+      "progression": "double_progression"
+    },
+    "unilateral_squat": {
+      "group": "squat",
+      "progression": "double_progression"
+    },
+    "bench": {
+      "group": "push",
+      "progression": "double_progression"
+    },
+    "box_squat": {
+      "group": "squat",
+      "progression": "double_progression"
+    },
+    "shoulder_press": {
+      "group": "push",
+      "progression": "double_progression"
+    },
+    "row": {
+      "group": "pull",
+      "progression": "double_progression"
+    },
+    "hip_thrust": {
+      "group": "hinge",
+      "progression": "double_progression"
+    },
+    "core_front": {
+      "group": "core",
+      "progression": "holds"
+    },
+    "core_side": {
+      "group": "core",
+      "progression": "holds"
+    },
+    "curl": {
+      "group": "arms",
+      "progression": "double_progression"
+    },
+    "triceps": {
+      "group": "arms",
+      "progression": "double_progression"
+    },
+    "desk": {
+      "group": "mixed",
+      "progression": "mini_sets",
+      "note": "Desk exercises are a menu, not a ladder. Rung is display order."
+    }
+  },
+  "exercises": [
+    {
+      "id": "band_assisted_pullup",
+      "name": "Band-assisted pull-up",
+      "ladder": "pullup",
+      "rung": 1,
+      "group": "pull",
+      "load": "band_assist",
+      "dumbbells": 0,
+      "equipment": [
+        "pullup_bar",
+        "bands"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        5,
+        8
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Band looped over the bar and under a foot or knee. Full hang to chin over the bar."
+    },
+    {
+      "id": "strict_pullup",
+      "name": "Strict pull-up",
+      "ladder": "pullup",
+      "rung": 2,
+      "group": "pull",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "equipment": [
+        "pullup_bar"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        1,
+        10
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Full hang to chin over the bar, no kipping or swinging."
+    },
+    {
+      "id": "pullup_negative",
+      "name": "Pull-up negative",
+      "ladder": "pullup_accessory",
+      "rung": 1,
+      "group": "pull",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "equipment": [
+        "pullup_bar"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        3,
+        3
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Step or jump to the top, then lower for 3 to 5 seconds to a full hang."
+    },
+    {
+      "id": "db_romanian_deadlift",
+      "name": "Dumbbell Romanian deadlift",
+      "ladder": "rdl",
+      "rung": 1,
+      "group": "hinge",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Soft knees, push the hips back, dumbbells close to the legs. Stop when the hamstrings are stretched."
+    },
+    {
+      "id": "db_single_leg_rdl",
+      "name": "Single-leg dumbbell Romanian deadlift",
+      "ladder": "rdl",
+      "rung": 2,
+      "group": "hinge",
+      "load": "dumbbell",
+      "dumbbells": 1,
+      "equipment": [
+        "dumbbells"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": true,
+      "reps": [
+        10,
+        15
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Hinge on one leg with the free leg reaching back. Keep the hips square to the floor."
+    },
+    {
+      "id": "db_split_squat",
+      "name": "Dumbbell split squat",
+      "ladder": "unilateral_squat",
+      "rung": 1,
+      "group": "squat",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": true,
+      "reps": [
+        10,
+        15
+      ],
+      "seconds": null,
+      "knee": "moderate",
+      "cue": "Staggered stance, lower the back knee straight down, control the depth."
+    },
+    {
+      "id": "db_reverse_lunge",
+      "name": "Dumbbell reverse lunge",
+      "ladder": "unilateral_squat",
+      "rung": 2,
+      "group": "squat",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": true,
+      "reps": [
+        10,
+        15
+      ],
+      "seconds": null,
+      "knee": "moderate",
+      "cue": "Step back, lower the back knee toward the floor, drive up through the front heel."
+    },
+    {
+      "id": "db_bulgarian_split_squat",
+      "name": "Dumbbell Bulgarian split squat",
+      "ladder": "unilateral_squat",
+      "rung": 3,
+      "group": "squat",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": true,
+      "reps": [
+        10,
+        15
+      ],
+      "seconds": null,
+      "knee": "high",
+      "cue": "Rear foot on the bench, front foot far enough forward that the knee tracks over the toes."
+    },
+    {
+      "id": "db_bulgarian_split_squat_pause",
+      "name": "Bulgarian split squat with pause",
+      "ladder": "unilateral_squat",
+      "rung": 4,
+      "group": "squat",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": true,
+      "reps": [
+        10,
+        15
+      ],
+      "seconds": null,
+      "knee": "high",
+      "cue": "Same setup, hold 2 seconds at the bottom of every rep."
+    },
+    {
+      "id": "db_bench_press",
+      "name": "Dumbbell bench press",
+      "ladder": "bench",
+      "rung": 1,
+      "group": "push",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Shoulder blades pinned, lower to chest level with elbows about 45 degrees from the body."
+    },
+    {
+      "id": "db_incline_press",
+      "name": "Incline dumbbell press",
+      "ladder": "bench",
+      "rung": 2,
+      "group": "push",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Bench at about 30 degrees. Press up and slightly back."
+    },
+    {
+      "id": "db_bench_press_pause",
+      "name": "Dumbbell bench press with pause",
+      "ladder": "bench",
+      "rung": 3,
+      "group": "push",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Hold 2 seconds with the dumbbells at chest level on every rep."
+    },
+    {
+      "id": "db_bench_press_tempo",
+      "name": "Dumbbell bench press, 3-second lowering",
+      "ladder": "bench",
+      "rung": 4,
+      "group": "push",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Take 3 seconds to lower, then press."
+    },
+    {
+      "id": "feet_elevated_pushup",
+      "name": "Feet-elevated push-up",
+      "ladder": "bench",
+      "rung": 5,
+      "group": "push",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "equipment": [
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        10,
+        15
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Feet on the bench, body in a straight line, chest to the floor."
+    },
+    {
+      "id": "goblet_box_squat",
+      "name": "Goblet box squat",
+      "ladder": "box_squat",
+      "rung": 1,
+      "group": "squat",
+      "load": "dumbbell",
+      "dumbbells": 1,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "moderate",
+      "cue": "One dumbbell held at the chest. Sit back to the bench, touch without relaxing, stand."
+    },
+    {
+      "id": "goblet_box_squat_pause",
+      "name": "Goblet box squat with pause",
+      "ladder": "box_squat",
+      "rung": 2,
+      "group": "squat",
+      "load": "dumbbell",
+      "dumbbells": 1,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "moderate",
+      "cue": "Sit fully on the bench for 2 seconds, stay braced, stand without rocking."
+    },
+    {
+      "id": "goblet_box_squat_tempo",
+      "name": "Goblet box squat, 3-second lowering",
+      "ladder": "box_squat",
+      "rung": 3,
+      "group": "squat",
+      "load": "dumbbell",
+      "dumbbells": 1,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "moderate",
+      "cue": "Take 3 seconds to reach the bench, then stand."
+    },
+    {
+      "id": "db_seated_shoulder_press",
+      "name": "Seated dumbbell shoulder press",
+      "ladder": "shoulder_press",
+      "rung": 1,
+      "group": "push",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Bench upright. Press overhead without arching the lower back."
+    },
+    {
+      "id": "db_standing_shoulder_press",
+      "name": "Standing dumbbell shoulder press",
+      "ladder": "shoulder_press",
+      "rung": 2,
+      "group": "push",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Brace the core, squeeze the glutes, press straight up."
+    },
+    {
+      "id": "db_standing_shoulder_press_tempo",
+      "name": "Standing shoulder press, 3-second lowering",
+      "ladder": "shoulder_press",
+      "rung": 3,
+      "group": "push",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Take 3 seconds to lower, then press."
+    },
+    {
+      "id": "db_chest_supported_row",
+      "name": "Chest-supported dumbbell row",
+      "ladder": "row",
+      "rung": 1,
+      "group": "pull",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Chest on the incline bench, row the dumbbells toward the hips, squeeze the shoulder blades."
+    },
+    {
+      "id": "db_chest_supported_row_pause",
+      "name": "Chest-supported row with pause",
+      "ladder": "row",
+      "rung": 2,
+      "group": "pull",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Hold the squeeze for 2 seconds at the top of every rep."
+    },
+    {
+      "id": "db_chest_supported_row_tempo",
+      "name": "Chest-supported row, 3-second lowering",
+      "ladder": "row",
+      "rung": 3,
+      "group": "pull",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Take 3 seconds to lower to a full stretch."
+    },
+    {
+      "id": "db_hip_thrust",
+      "name": "Dumbbell hip thrust",
+      "ladder": "hip_thrust",
+      "rung": 1,
+      "group": "hinge",
+      "load": "dumbbell",
+      "dumbbells": 1,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        12
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Upper back on the bench, dumbbell across the hips, drive up to a straight line from knees to shoulders."
+    },
+    {
+      "id": "single_leg_hip_thrust",
+      "name": "Single-leg hip thrust",
+      "ladder": "hip_thrust",
+      "rung": 2,
+      "group": "hinge",
+      "load": "dumbbell",
+      "dumbbells": 1,
+      "equipment": [
+        "dumbbells",
+        "bench"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": true,
+      "reps": [
+        10,
+        15
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Same setup on one leg. Keep the hips level."
+    },
+    {
+      "id": "plank",
+      "name": "Plank",
+      "ladder": "core_front",
+      "rung": 1,
+      "group": "core",
+      "load": "hold",
+      "dumbbells": 0,
+      "equipment": [],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": [
+        30,
+        60
+      ],
+      "knee": "low",
+      "cue": "Forearms down, straight line from head to heels, squeeze the glutes."
+    },
+    {
+      "id": "hollow_hold",
+      "name": "Hollow hold",
+      "ladder": "core_front",
+      "rung": 2,
+      "group": "core",
+      "load": "hold",
+      "dumbbells": 0,
+      "equipment": [],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": [
+        20,
+        40
+      ],
+      "knee": "low",
+      "cue": "Lower back pressed into the floor, arms and legs extended just off the floor."
+    },
+    {
+      "id": "side_plank",
+      "name": "Side plank",
+      "ladder": "core_side",
+      "rung": 1,
+      "group": "core",
+      "load": "hold",
+      "dumbbells": 0,
+      "equipment": [],
+      "context": [
+        "session"
+      ],
+      "unilateral": true,
+      "reps": null,
+      "seconds": [
+        20,
+        45
+      ],
+      "knee": "low",
+      "cue": "Elbow under the shoulder, hips high in a straight line."
+    },
+    {
+      "id": "db_curl",
+      "name": "Dumbbell curl",
+      "ladder": "curl",
+      "rung": 1,
+      "group": "arms",
+      "load": "dumbbell",
+      "dumbbells": 2,
+      "equipment": [
+        "dumbbells"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        15
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "Elbows pinned to the sides, no swinging."
+    },
+    {
+      "id": "db_overhead_triceps_extension",
+      "name": "Overhead dumbbell triceps extension",
+      "ladder": "triceps",
+      "rung": 1,
+      "group": "arms",
+      "load": "dumbbell",
+      "dumbbells": 1,
+      "equipment": [
+        "dumbbells"
+      ],
+      "context": [
+        "session"
+      ],
+      "unilateral": false,
+      "reps": [
+        8,
+        15
+      ],
+      "seconds": null,
+      "knee": "low",
+      "cue": "One dumbbell held overhead with both hands. Lower behind the head with elbows pointing up."
+    },
+    {
+      "id": "desk_pushup",
+      "name": "Push-up",
+      "ladder": "desk",
+      "rung": 1,
+      "group": "push",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "equipment": [],
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "knee": "low",
+      "cue": "Hands on the floor or a sturdy desk edge. Stop well short of failure."
+    },
+    {
+      "id": "chair_squat",
+      "name": "Chair squat",
+      "ladder": "desk",
+      "rung": 2,
+      "group": "squat",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "equipment": [
+        "chair"
+      ],
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "knee": "moderate",
+      "cue": "Sit back until you touch the chair, stand without using your hands."
+    },
+    {
+      "id": "pullup_single",
+      "name": "Pull-up single",
+      "ladder": "desk",
+      "rung": 3,
+      "group": "pull",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "equipment": [
+        "pullup_bar"
+      ],
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "knee": "low",
+      "cue": "One or two clean reps, then walk away."
+    },
+    {
+      "id": "glute_bridge",
+      "name": "Glute bridge",
+      "ladder": "desk",
+      "rung": 4,
+      "group": "hinge",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "equipment": [],
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "knee": "low",
+      "cue": "On your back with feet flat, drive the hips up and squeeze. Replaces chair squats on sore-knee days."
+    },
+    {
+      "id": "calf_raise",
+      "name": "Calf raise",
+      "ladder": "desk",
+      "rung": 5,
+      "group": "squat",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "equipment": [],
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "knee": "low",
+      "cue": "Rise onto the balls of the feet, pause, lower slowly."
+    },
+    {
+      "id": "wall_sit",
+      "name": "Wall sit",
+      "ladder": "desk",
+      "rung": 6,
+      "group": "squat",
+      "load": "hold",
+      "dumbbells": 0,
+      "equipment": [],
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": [
+        20,
+        45
+      ],
+      "knee": "moderate",
+      "cue": "Back flat on the wall, knees at a comfortable angle, hold."
+    }
+  ]
+}
