@@ -44,11 +44,11 @@ Claude Code:
 
 ### Task 2.1: Schema and seed data (branch `feat/schema`)
 
-- [ x] Migration `init`: the tables in the Schema section below, with row-level security. New tables are not exposed automatically, so the migration also grants each table's allowed actions to the `authenticated` role, matching the policies (log tables get select and insert only). The `anon` role gets no grants on user tables.
-- [ x] Migration `seed_exercises`: insert every exercise from `docs/exercise-library.json`. Generate the SQL from the JSON with a small script checked into `scripts/`, so the seed can be regenerated if the library changes.
-- [ x] A `*_current` view for each log table that hides superseded and voiding rows. Create each view with `security_invoker = true`; without it, a Postgres view runs with its owner's permissions and skips row-level security.
-- [x ] Checks in `supabase/checks.sql`: signed-out access refused, own rows only, no edits or deletes on logs, corrections and voids, value limits. `npm test` runs them against a local Postgres (PGlite) with every migration applied; `node scripts/check-db.mjs` runs them against the hosted project.
-- [ x] Push the migrations and generate TypeScript types into `src/lib/database.types.ts`.
+- [x] Migration `init`: the tables in the Schema section below, with row-level security. New tables are not exposed automatically, so the migration also grants each table's allowed actions to the `authenticated` role, matching the policies (log tables get select and insert only). The `anon` role gets no grants on user tables.
+- [x] Migration `seed_exercises`: insert every exercise from `docs/exercise-library.json`. Generate the SQL from the JSON with a small script checked into `scripts/`, so the seed can be regenerated if the library changes.
+- [x] A `*_current` view for each log table that hides superseded and voiding rows. Create each view with `security_invoker = true`; without it, a Postgres view runs with its owner's permissions and skips row-level security.
+- [x] Checks in `supabase/checks.sql`: signed-out access refused, own rows only, no edits or deletes on logs, corrections and voids, value limits. `npm test` runs them against a local Postgres (PGlite) with every migration applied; `node scripts/check-db.mjs` runs them against the hosted project.
+- [x] Push the migrations and generate TypeScript types into `src/lib/database.types.ts`.
 - Done when: the migrations apply cleanly, a request with the publishable key and no signed-in user is refused by every table and view, a signed-in user reads back all 36 exercises, and `node scripts/check-db.mjs` passes.
 
 ### Task 2.2: Workout engine (branch `feat/engine`)
