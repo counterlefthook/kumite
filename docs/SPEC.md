@@ -111,7 +111,7 @@ Given the minutes available and a 10-second check-in, the engine returns a worko
 2. Context: the engine also reads the last logged fight session, plus this week's hard sets per muscle group.
 3. Filter: keep exercises that match the equipment and context. A desk break only offers moves done in work clothes without a shower: squats, push-ups, wall sits, calf raises.
 4. Pace: each muscle group has a weekly target of hard sets. Groups furthest behind pace fill first, where pace = target × days elapsed ÷ 7.
-5. Guardrails: leg soreness of 4 or more, or fight training within 24 hours, caps leg work at 2 sets ending 2 or more reps short. Overall soreness of 4 or more, or energy of 2 or less, swaps in an easy ride or mobility. Knee pain above 3, at check-in or flagged on a set, swaps the squat slot for hip-dominant work and drops that exercise one rung next time.
+5. Guardrails: leg soreness of 4 or more, or fight training within 24 hours, caps leg work at 2 sets ending 2 or more reps short. Upper-body soreness of 4 or more, or energy of 2 or less, swaps in an easy ride or mobility. Knee pain above 3, at check-in or flagged on a set, swaps the squat slot for hip-dominant work and drops that exercise one rung next time.
 6. Time box: 30 minutes gets both pairs plus the finisher, and 20 gets both pairs without it. 10 minutes gets one pair as EMOM (start a set at the top of each minute, rest for the remainder).
 7. Output: exercises in order, each with target weight, rep range, rounds, and rest at the current progression step.
 
@@ -201,7 +201,7 @@ Same stack and pattern as Baby Tracker: Next.js on Vercel, Supabase, a GitHub re
 
 ## Decisions
 
-Twenty-four decisions so far; new ones get appended with their date.
+Thirty decisions so far; new ones get appended with their date.
 
 | Date | Decision | Why |
 | --- | --- | --- |
@@ -229,6 +229,12 @@ Twenty-four decisions so far; new ones get appended with their date.
 | 2026-09-24 | Log tables get a `voided` column: a correction row with `voided = true` cancels the row it supersedes | A set logged by mistake needs a way out while the log stays append-only |
 | 2026-09-24 | `desk_sets` also records seconds | Wall sits are a desk-break option and are timed, not counted |
 | 2026-09-24 | Claude runs database commands from the cloud session with a Supabase access token, on one branch per PLAN task | Chris is not always at his PC; the same checks run locally in tests and against the hosted project |
+| 2026-09-24 | Pull-up sets in Stages 1 to 3 follow the week's rounds, like every other pair | Pull-ups and deadlifts alternate cleanly as a superset, and the easier first weeks apply to pull-ups too |
+| 2026-09-24 | Pull-up Stage 4 adds reps first, then sets: 3 sets of (max minus 2), one rep a week to max minus 1, then one set a week to 5 | Chris's pick; a new max test starts the cycle over |
+| 2026-09-24 | The recovery check wins over the quota squeeze, which only overrides the one-day spacing rule | A bad check-in gets an easy day even when the week is short |
+| 2026-09-24 | Core and arm finishers run at the week's rounds | Chris's pick; keeps every block on the same schedule |
+| 2026-09-24 | Fight calories use Compendium code 15430 (martial arts, moderate pace, MET 10.3) for every session | Kickboxing and MMA sit under martial arts; one value keeps it simple |
+| 2026-09-24 | The recovery check uses upper-body soreness and energy; sore legs alone get the leg cap and still train | As first written, overall soreness meant sore legs always forced an easy day, so the leg cap could never apply |
 
 ## Plan
 

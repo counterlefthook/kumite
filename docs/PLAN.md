@@ -55,10 +55,10 @@ Claude Code:
 
 Build the engine as pure functions with tests written alongside each rule. This comes before any screen because a rule bug here would mis-progress Chris for weeks without anything looking broken.
 
-- [ ] Module layout in `src/engine/`: `types.ts`, `library.ts` (reads and validates the exercise library shape), `calendar.ts`, `targets.ts`, `pacing.ts`, `progression.ts`, `pullups.ts`, `guardrails.ts`, `timebox.ts`, `desk.ts`, `metrics.ts`, and `generate.ts` as the single entry point that returns a workout plan.
-- [ ] Time-zone math uses a well-maintained library (for example `date-fns` with `@date-fns/tz`), never hand-written offsets.
-- [ ] Implement every rule in the Engine rules section below.
-- [ ] Write every test in the Required tests section below, as table-driven Vitest cases with plain-language names.
+- [x] Module layout in `src/engine/`: `types.ts`, `library.ts` (reads and validates the exercise library shape), `calendar.ts`, `targets.ts`, `pacing.ts`, `progression.ts`, `pullups.ts`, `guardrails.ts`, `timebox.ts`, `desk.ts`, `metrics.ts`, and `generate.ts` as the single entry point that returns a workout plan.
+- [x] Time-zone math uses a well-maintained library (for example `date-fns` with `@date-fns/tz`), never hand-written offsets.
+- [x] Implement every rule in the Engine rules section below.
+- [x] Write every test in the Required tests section below, as table-driven Vitest cases with plain-language names.
 - Done when: all required tests pass, and the lint rule confirms nothing in `src/engine/` imports React, Next, or Supabase.
 
 ### Task 2.3: Sign-in (branch `feat/auth`)
@@ -161,7 +161,7 @@ These are the precise, testable versions of the rules in `docs/SPEC.md`.
 | 5 onward, recovery holding | 12 | 4 |
 | 5 onward, recovery not holding | 9 | 3 |
 
-Recovery is holding when, across the previous two program weeks, average check-in soreness (the higher of legs and upper on each check-in) is 3 or lower and average energy is 3 or higher.
+Recovery is holding when, across the previous two program weeks, average check-in soreness (the higher of legs and upper on each check-in) is 3 or lower and average energy is 3 or higher. No check-ins in those two weeks counts as not holding. Dates before `program_start_date` count as week 1.
 
 ### Pace
 
@@ -171,60 +171,61 @@ Recovery is holding when, across the previous two program weeks, average check-i
 
 ### Choosing today's suggestion, in order
 
-1. Recovery check: overall soreness of 4 or more, or energy of 2 or less, suggests an easy 30-minute Zone 2 ride or 15 minutes of mobility instead of strength.
-2. Spacing: if a strength session was logged yesterday (local date), suggest a ride, mobility, or desk sets. "Train anyway" is allowed and logs `override = true`.
-3. Template: A if no strength session exists yet; otherwise the opposite of the most recent strength session's template. Alternation ignores week boundaries.
+1. Recovery check: upper-body soreness of 4 or more, or energy of 2 or less, suggests an easy 30-minute Zone 2 ride or 15 minutes of mobility instead of strength. Sore legs alone still train, with the leg cap in step 5.
+2. Spacing: if a strength session was logged yesterday (local date), suggest a ride, mobility, or desk sets. "Train anyway" is allowed and logs `override = true`. A desk break skips steps 1 and 2, since desk sets are not hard training.
+3. Template: A if no strength session exists yet; otherwise the opposite of the most recent strength session's template. Calibration sessions count as their template's first session. Alternation ignores week boundaries.
 4. Time box:
-   - 30 minutes: pair 1, then pair 2, at the week's rounds, then the finisher. Offer the optional arm finisher afterward.
+   - 30 minutes: pair 1, then pair 2, at the week's rounds, then the finisher. Offer the optional arm finisher afterward. Both finishers also run at the week's rounds.
    - 20 minutes: pair 1 and pair 2 at the week's rounds, with no finisher.
-   - 10 minutes: one pair as EMOM for 10 minutes (5 sets of each exercise, alternating every minute). Choose the pair whose two groups have the larger combined deficit.
-   - Desk break: one desk exercise, the one furthest behind its target so far today, sized as a mini-set.
+   - 10 minutes: one pair as EMOM for 10 minutes (5 sets of each exercise, alternating every minute). Choose the pair whose two groups have the larger combined deficit; a tie keeps pair 1.
+   - Desk break: one desk exercise, the one furthest behind its target so far today, sized as a mini-set. "Furthest behind" is the biggest shortfall against the daily target times the share of the workday gone, measured as a share of the daily target. Ties go push-ups, chair squats, pull-up singles. Before work starts and on weekends, it picks the one with the smallest share of the weekday target done.
 5. Guardrail caps:
    - Fight training in the next 24 hours, or leg soreness of 4 or more: squat and hinge exercises get at most 2 sets, with a target of at least 2 reps in reserve.
    - Knee pain above 3 at check-in: swap the squat slot using `knee_swaps` (A: unilateral squat becomes the hip thrust ladder; B: box squat becomes the Romanian deadlift ladder), at that ladder's current rung and load. Those sets count toward hinge.
-6. Quota squeeze: with `strength_left = 3 − strength sessions this week` and `days_left` counting today, if `2 × strength_left − 1 > days_left`, stop suggesting rides, and allow strength on consecutive days using the 20-minute time box.
+6. Quota squeeze: with `strength_left = 3 − strength sessions this week` and `days_left` counting today, if `2 × strength_left − 1 > days_left`, stop suggesting rides, and allow strength on consecutive days using the 20-minute time box. The recovery check (step 1) still wins. The squeeze only overrides spacing (step 2): strength is suggested without "train anyway", and a 30-minute pick becomes 20.
 7. Output: for each exercise, the name, cue, target load (dumbbell setting, band, or bodyweight), rep or seconds range, rounds, target reps in reserve (1 to 2 by default, 2 or more when capped), and rest after each pair (75 seconds by default, 60 to 90 allowed), plus the plain-language reason for every adjustment.
 
 ### Progression for dumbbell exercises
 
-Evaluated from the most recent session that included the exercise.
+Evaluated from the most recent session that included the exercise. The current state is rebuilt by replaying every session of the ladder in order, using the weight actually logged at each step.
 
 - Topped: every working set reached the top of the rep range with at least 1 rep in reserve.
 - Missed: at least one working set fell below the bottom of the range in each of the last two sessions with that exercise.
 - Topped and below the highest dumbbell setting: the next session uses the next setting up.
-- Topped at the highest setting: widen the range. 8 to 12 becomes 12 to 15, then 15 to 20. 10 to 15 becomes 15 to 20.
-- Topped at 15 to 20 on the highest setting: move to the next rung, starting at 75% of the current setting rounded down to an available setting, with the new exercise's base range.
-- Topped at 15 to 20 on the last rung: add one set to that exercise (maximum 4) and mark the ladder complete.
+- Topped at the highest setting: widen the range. 8 to 12 becomes 12 to 15, then 15 to 20. 10 to 15 and 8 to 15 become 15 to 20.
+- Topped at 15 to 20 on the highest setting: move to the next rung, starting at 75% of the current setting rounded down to an available setting (never below the lowest), with the new exercise's base range. A bodyweight next rung has no load.
+- Topped at 15 to 20 on the last rung: add one set to that exercise (maximum 4) and mark the ladder complete. Each further top adds another set on top of the week's rounds, still at most 4.
 - Missed: drop one setting (never below the lowest) and keep the range.
 - Anything else: hold weight and range.
-- Knee flag: when any squat-slot set is flagged, the rest of that exercise's sets that session swap using `knee_swaps`, and next time that exercise drops one rung (or one setting when already on rung 1).
+- Knee flag: when any squat-slot set is flagged, the rest of that exercise's sets that session swap using `knee_swaps`, and next time that exercise drops one rung (or one setting when already on rung 1). The lower rung keeps the same dumbbell setting and uses its base range.
 - A rung change takes precedence over a load change when both would apply.
 - Bodyweight exercises follow the same rules without load: top of range, then widen, then next rung, then an added set on the last rung.
-- Holds (seconds): when all sets reach the top of the seconds range, move to the next rung. On the last rung, raise the range by 10 seconds at the bottom and 15 at the top, up to a 90-second top.
-- Calibration sets the starting load for rung 1 of each ladder. If Chris cannot reach 10 reps at the lowest setting, start at the lowest setting and let the rules take over.
+- Holds (seconds): when all sets reach the top of the seconds range, move to the next rung. On the last rung, raise the range by 10 seconds at the bottom and 15 at the top, up to a 90-second top, then hold (side plank: 20-45, 30-60, 40-75, 50-90).
+- Calibration sets the starting load for rung 1 of each ladder. If Chris cannot reach 10 reps at the lowest setting, start at the lowest setting and let the rules take over. A ladder with no calibration starts at the lowest setting.
 
 ### Pull-up stages
 
-- Stage 1: band-assisted pull-ups, 3 sets of 5 to 8 with the current band (starting with the heaviest band that allowed 5 reps in calibration), then 3 negatives lowered over 3 to 5 seconds.
-- Stage 2: when all band sets reach 8, the next session moves to the next lighter band. Repeat until the lightest band.
-- Stage 3: after 3 sets of 8 on the lightest band, switch to strict sets: 3 sets of (latest max minus 1, minimum 1), then one band-assisted back-off set to 8 on the lightest band.
-- Stage 4: once a max test reaches 5, do 3 to 5 strict sets at 1 to 2 reps below the latest max, adding one rep to each set or one set (maximum 5) each week.
+- Stage 1: band-assisted pull-ups, sets of 5 to 8 at the week's rounds (2, 3, or 4) with the current band (starting with the heaviest band that allowed 5 reps in calibration), then 3 negatives lowered over 3 to 5 seconds.
+- Stage 2: when all band sets reach 8, the next session moves to the next lighter band, with the same sets and negatives. Repeat until the lightest band.
+- Stage 3: after all sets reach 8 on the lightest band, switch to strict sets: the week's rounds of (latest max minus 1, minimum 1), then one band-assisted back-off set to 8 on the lightest band. No negatives.
+- Stage 4: once a max test reaches 5, start at 3 strict sets of (latest max minus 2, minimum 1). Each new program week adds one rep to every set until reps reach max minus 1, then one set a week up to 5, then holds. A new max test starts over.
+- A 10-minute EMOM skips the negatives and the back-off set.
 - Max test: offered once 14 days have passed since the last test, and required by day 21. It logs as a `max_test` session with a single all-out set.
 - Milestones at 5, 8, and 10 strict reps get a celebration screen.
 
 ### Desk sets
 
 - Daily targets: push-ups 100 a day; chair squats 25 per work hour (200 across a 9:00 to 17:00 workday); pull-up singles 5 a day. All editable in Settings.
-- Mini-set size: half the latest max for that exercise, rounded down, minimum 1. Maxes come from calibration, a push-up retest every 4 weeks, and pull-up max tests.
-- Knee pain above 3 at the day's check-in swaps chair squats for glute bridges that day.
+- Mini-set size: half the latest max for that exercise, rounded down, minimum 1. Maxes come from calibration, a push-up retest every 4 weeks, and pull-up max tests. Pull-up singles are always 1 rep.
+- Knee pain above 3 at the day's check-in swaps chair squats for glute bridges that day. Glute bridges are sized from the chair squat max and count toward the squat target.
 - Workdays are Monday to Friday. Weekends show totals without targets.
 
 ### Derived metrics
 
 - Estimated 1-rep max (Epley): weight × (1 + reps ÷ 30), from the best set per exercise per session. Compare only within one exercise.
-- 7-day average weight: the mean of weigh-ins over the last 7 days, shown only when there are at least 3.
-- Fight session calories: MET × body weight in kg × hours, using the 7-day average weight or the latest weigh-in. Take MET values from the 2024 Adult Compendium of Physical Activities and cite the activity codes in a code comment.
-- Streak: consecutive workdays with every desk target met.
+- 7-day average weight: the mean of weigh-ins over the 7 local calendar days ending today, shown only when there are at least 3.
+- Fight session calories: MET × body weight in kg × hours, using the 7-day average weight or the latest weigh-in. Take MET values from the 2024 Adult Compendium of Physical Activities and cite the activity codes in a code comment. Every fight session uses code 15430 (martial arts, moderate pace, including kickboxing and Muay Thai), MET 10.3, whatever the effort.
+- Streak: consecutive workdays with every desk target met. Weekends are skipped, and today counts only once its targets are met, so an unfinished today does not break the streak.
 
 ### Required tests
 
@@ -249,4 +250,4 @@ Evaluated from the most recent session that included the exercise.
 
 Ideas and gaps captured during the build go here instead of into the current task.
 
-- (empty)
+- Idea button (2026-09-24, from Chris): an "idea" button on every screen, like Baby Tracker's dev notes. It opens a sheet with a text box and saves the note to a `dev_notes` table with the screen, the app version, a status (open, planned, done), and the version it was addressed in. Claude reads open notes from the cloud session with the Supabase access token at the start of each task and marks them done when shipped, so no secret export link is needed. Needs sign-in (Task 2.3) and a migration; suggested as its own task right after 2.3.
