@@ -36,7 +36,7 @@ Claude Code:
 
 ### Task 1.4: Vercel
 
-- [ ] Create a Vercel project from the GitHub repo. Chris can do this in the Vercel dashboard, or ask Claude in chat to create it with the Vercel connector.
+- [x] Create a Vercel project from the GitHub repo. Chris can do this in the Vercel dashboard, or ask Claude in chat to create it with the Vercel connector.
 - [ ] Chris adds `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the Vercel project's environment variables for Production and Preview. Keys are pasted directly into Vercel and never into a chat.
 - Done when: the production URL shows the scaffold, and a pushed test branch gets its own preview URL.
 
