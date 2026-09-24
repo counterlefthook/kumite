@@ -46,8 +46,9 @@ These repo files are the source of truth. If SPEC and PLAN disagree, or a rule i
 - `npm run typecheck`: TypeScript check with no output files
 - `npx supabase migration new <name>`: create a new migration file
 - `npx supabase db push`: apply migrations to the hosted Supabase project
-- `npx supabase gen types typescript --linked > src/lib/database.types.ts`: regenerate database types after a migration
-- `node scripts/build-seed.mjs > supabase/migrations/<timestamp>_seed_exercises.sql`: regenerate the exercise seed after changing `docs/exercise-library.json`
+- `npx supabase gen types typescript --linked > src/lib/database.types.ts`: regenerate database types after a migration. In PowerShell: `cmd /c "npx supabase gen types typescript --linked > src\lib\database.types.ts"`
+- `node scripts/build-seed.mjs > supabase/migrations/<timestamp>_seed_exercises.sql`: regenerate the exercise seed after changing `docs/exercise-library.json`. In PowerShell: `cmd /c "node scripts\build-seed.mjs > supabase\migrations\<timestamp>_seed_exercises.sql"`
+- Why the PowerShell versions: Windows PowerShell's `>` saves files as UTF-16, which ESLint, git, and the Supabase CLI treat as binary. `cmd /c` runs the command in the classic command prompt, whose `>` writes the output unchanged as UTF-8.
 - `node scripts/check-db.mjs`: run the permission and row-level security checks in `supabase/checks.sql` against the hosted project (needs `SUPABASE_ACCESS_TOKEN`)
 
 ## Design direction
