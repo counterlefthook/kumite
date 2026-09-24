@@ -141,8 +141,11 @@ describe("required test 11: time boxes", () => {
     expect(run({ timeBox: "desk", checkIn: { ...CALM, energy: 1 } }).kind).toBe("desk_break");
   });
 
-  it("strength without a check-in is refused", () => {
-    expect(() => run({ checkIn: null })).toThrow(/check-in is required/);
+  it("without a check-in (0.1), strength is planned with no caps or swaps", () => {
+    const s = strength(run({ now: at("2026-10-13", "07:00"), checkIn: null }));
+    expect(find(s, "rdl")).toMatchObject({ sets: 3, targetRir: { min: 1, max: 2 } });
+    expect(find(s, "unilateral_squat")).toBeDefined();
+    expect(s.reasons).toEqual([]);
   });
 });
 

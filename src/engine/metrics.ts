@@ -63,9 +63,9 @@ export function fightCalories(session: SessionLog, metrics: BodyMetric[], now: D
 }
 
 /**
- * Consecutive workdays with every desk target met. Weekends are skipped, and
- * today counts only once its targets are met (an unfinished today does not
- * break the streak).
+ * Consecutive workdays with every desk target met. Weekends and fight days are
+ * skipped, and today counts only once its targets are met (an unfinished today
+ * does not break the streak).
  */
 export function deskStreak(lib: Library, profile: Profile, history: History, now: Date): number {
   const zone = profile.timezone;
@@ -75,6 +75,8 @@ export function deskStreak(lib: Library, profile: Profile, history: History, now
   let streak = 0;
   for (let d = today; d >= earliest; d = addLocalDays(d, -1)) {
     if (!isWorkday(d)) continue;
+    const fightDay = history.sessions.some((s) => s.kind === "fight" && localDate(s.startedAt, zone) === d);
+    if (fightDay && !deskTargetsMet(lib, profile, history, d)) continue;
     if (deskTargetsMet(lib, profile, history, d)) streak++;
     else if (d !== today) break;
   }

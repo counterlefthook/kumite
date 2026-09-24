@@ -65,66 +65,66 @@ Build the engine as pure functions with tests written alongside each rule. This 
 
 Moved up from the end of the stage (decided 2026-09-24) so every screen after it is built in the Kumite style.
 
-- [ ] Design tokens (colors, fonts, spacing) defined in one place: an original fighting-game style with dark stone, blood red, fire orange, and carved gold, at strong contrast. No game or film logos, names, characters, or fonts.
-- [ ] A carved display face for the title and big headings (for example Cinzel, loaded through `next/font`), and a highly readable face for body text and logging (for example Atkinson Hyperlegible).
-- [ ] Shared pieces the later screens reuse: the gold title, a health-bar progress meter, a stone panel, and big buttons (at least 48 px, most 64 px or more).
-- [ ] A title screen replaces the Next.js starter page.
-- [ ] An original Kumite emblem as the app icon (192 px, 512 px, and a 180 px Apple touch icon).
-- [ ] Web app manifest: name, short name, theme color, and standalone display.
+- [x] Design tokens (colors, fonts, spacing) defined in one place: an original fighting-game style with dark stone, blood red, fire orange, and carved gold, at strong contrast. No game or film logos, names, characters, or fonts.
+- [x] A carved display face for the title and big headings (for example Cinzel, loaded through `next/font`), and a highly readable face for body text and logging (for example Atkinson Hyperlegible).
+- [x] Shared pieces the later screens reuse: the gold title, a health-bar progress meter, a stone panel, and big buttons (at least 48 px, most 64 px or more).
+- [x] A title screen replaces the Next.js starter page.
+- [x] An original Kumite emblem as the app icon (192 px, 512 px, and a 180 px Apple touch icon).
+- [x] Web app manifest: name, short name, theme color, and standalone display.
 - Done when: the production URL shows the Kumite title screen, and Chris adds Kumite from Safari's Share menu to his home screen and it launches full screen with the Kumite icon.
 
 ### Task 2.4: Sign-in (branch `feat/auth`)
 
-- [ ] A sign-in screen with email and password through Supabase Auth, and no sign-up or forgot-password flow. Chris signs in once inside the installed app (it keeps its storage separate from Safari), and the session then refreshes itself on every visit. No emailed links or codes anywhere; a forgotten password is reset in the Supabase dashboard.
-- [ ] Use `@supabase/ssr` following Supabase's current Next.js guide for the server client, browser client, and session refresh.
-- [ ] Every route requires sign-in except the sign-in page, the manifest, and icons.
-- [ ] A sign-out button in Settings.
+- [x] A sign-in screen with email and password through Supabase Auth, and no sign-up or forgot-password flow. Chris signs in once inside the installed app (it keeps its storage separate from Safari), and the session then refreshes itself on every visit. No emailed links or codes anywhere; a forgotten password is reset in the Supabase dashboard.
+- [x] Use `@supabase/ssr` following Supabase's current Next.js guide for the server client, browser client, and session refresh.
+- [x] Every route requires sign-in except the sign-in page, the manifest, and icons.
+- [x] A sign-out button in Settings.
 - Done when: Chris signs in on the installed app and is still signed in after closing and reopening it.
 
 ### Task 2.5: Idea button (branch `feat/ideas`)
 
 Modeled on Baby Tracker's dev notes.
 
-- [ ] Migration `dev_notes`: `id`, `user_id`, `body`, `screen`, `app_version`, `status` (`open`, `planned`, `done`), `addressed_in`, `created_at`, with row-level security. Chris inserts and reads his own notes; status changes are made by Claude from the cloud session with the Supabase access token.
-- [ ] An idea button on every screen that opens a sheet with a text box and saves the note with the current screen and app version.
-- [ ] At the start of each later task, Claude reads the open notes and raises them with Chris; notes that ship get `status = done` and the version.
+- [x] Migration `dev_notes`: `id`, `user_id`, `body`, `screen`, `app_version`, `status` (`open`, `planned`, `done`), `addressed_in`, `created_at`, with row-level security. Chris inserts and reads his own notes; status changes are made by Claude from the cloud session with the Supabase access token.
+- [x] An idea button on every screen that opens a sheet with a text box and saves the note with the current screen and app version.
+- [x] At the start of each later task, Claude reads the open notes and raises them with Chris; notes that ship get `status = done` and the version.
 - Done when: a note saved on the phone appears in the table with its screen and version.
 
 ### Task 2.6: Onboarding and calibration (branch `feat/onboarding`)
 
-- [ ] Profile: height, weight, and a program start date that defaults to today.
-- [ ] Equipment: dumbbell settings (enter the lowest weight, highest weight, and step, or type the list), bench type, pull-up bar, and bands listed heaviest to lightest.
-- [ ] Work hours (default 9:00 to 17:00), desk targets, the weekly Peloton target (default 60 minutes), and home workouts a week (default 3), prefilled with the defaults in Engine rules. A migration adds `peloton_minutes_week` and `home_workouts_week` to `profile`.
-- [ ] Calibration, which can run across two sessions (the A exercises, then the B exercises), each counting as that template's first session. For rung 1 of each ladder, find the dumbbell setting done for 10 to 12 reps with 2 in reserve. Also record max push-ups, max chair squats (capped at 50), max strict pull-ups, and the heaviest band that allows 5 assisted pull-ups.
+- [x] Profile: height, weight, and a program start date that defaults to today.
+- [x] Equipment: dumbbell settings (enter the lowest weight, highest weight, and step, or type the list), bench type, pull-up bar, and bands listed heaviest to lightest.
+- [x] Work hours (default 9:00 to 17:00), desk targets, the weekly Peloton target (default 60 minutes), and home workouts a week (default 3), prefilled with the defaults in Engine rules. A migration adds `peloton_minutes_week` and `home_workouts_week` to `profile`.
+- [x] Calibration, which can run across two sessions (Chris enters the setting he found for each rung-1 exercise, plus his maxes and band; each template's entries save as one calibration session) (the A exercises, then the B exercises), each counting as that template's first session. For rung 1 of each ladder, find the dumbbell setting done for 10 to 12 reps with 2 in reserve. Also record max push-ups, max chair squats (capped at 50), max strict pull-ups, and the heaviest band that allows 5 assisted pull-ups.
 - Done when: onboarding saves the profile and equipment rows, and the calibration sets feed the engine's starting loads.
 
 ### Task 2.7: Day planner in the engine (branch `feat/day-planner`)
 
-- [ ] Make the check-in optional in `generate()`: with none, the recovery check, leg cap, and check-in knee swap are skipped.
-- [ ] Add `planDay()` in `src/engine/day.ts` following "Planning the day" below: the home screen's bars, the nudge, and the answer to "Gym today?".
-- [ ] Peloton minutes this week from `ride` sessions; fight days excused from desk goals in the nudge and the streak.
-- [ ] Table-driven tests for every rule in "Planning the day".
+- [x] Make the check-in optional in `generate()`: with none, the recovery check, leg cap, and check-in knee swap are skipped.
+- [x] Add `planDay()` in `src/engine/day.ts` following "Planning the day" below: the home screen's bars, the nudge, and the answer to "Gym today?".
+- [x] Peloton minutes this week from `ride` sessions; fight days excused from desk goals in the nudge and the streak.
+- [x] Table-driven tests for every rule in "Planning the day".
 - Done when: the new tests and all existing engine tests pass.
 
 ### Task 2.8: Home screen (branch `feat/home`)
 
-- [ ] Health bars for today's desk goals, and this week's Peloton minutes and home workouts.
-- [ ] The nudge line from `planDay()`.
-- [ ] "At your desk?": the one desk exercise to do now, huge, with a DONE button that logs a `desk_sets` row; FLAWLESS when every desk goal for the day is met.
-- [ ] "Gym today?": yes shows the fight day screen with a button to log the class; no shows the suggestion from `planDay()`.
+- [x] Health bars for today's desk goals, and this week's Peloton minutes and home workouts.
+- [x] The nudge line from `planDay()`.
+- [x] "At your desk?": the one desk exercise to do now, huge, with a DONE button that logs a `desk_sets` row; FLAWLESS when every desk goal for the day is met.
+- [x] "Gym today?": yes shows the fight day screen with a button to log the class; no shows the suggestion from `planDay()`.
 - Done when: Chris logs desk sets from the phone and the bars fill, and both gym answers show the right screen.
 
 ### Task 2.9: Home workout (branch `feat/workout`)
 
-- [ ] "OK, here's what we're going to do": the workout from `generate()` as one line per exercise with weight, sets, and reps.
-- [ ] Set logging: weight and reps prefilled from the plan, one tap to accept, steppers to adjust, reps-in-reserve buttons (0, 1, 2, 3, 4+), a knee flag on squat-slot sets, and a rest timer between pairs.
+- [x] "OK, here's what we're going to do": the workout from `generate()` as one line per exercise with weight, sets, and reps.
+- [x] Set logging: weight and reps prefilled from the plan, one tap to accept, steppers to adjust, reps-in-reserve buttons (0, 1, 2, 3, 4+), a knee flag on squat-slot sets, and a rest timer between pairs.
 - Done when: Chris completes an A session and a B session, and the next suggestion reflects what he logged.
 
 ### Task 2.10: Fight classes, Peloton, and body metrics (branch `feat/other-logs`)
 
-- [ ] Fight class: kickboxing or MMA, minutes, effort (1 to 10), and estimated calories.
-- [ ] Peloton: ride or class, minutes, and for rides Peloton's output (kJ) and calorie figure. Saved as `ride` sessions.
-- [ ] Body metrics: morning weight (daily, optional) and waist (weekly).
+- [x] Fight class: kickboxing or MMA, minutes, effort (1 to 10), and estimated calories.
+- [x] Peloton: ride or class, minutes, and for rides Peloton's output (kJ) and calorie figure. Saved as `ride` sessions, with "Peloton ride" or "Peloton class" in `notes`.
+- [x] Body metrics: morning weight (daily, optional) and waist (weekly).
 - Done when: each saves as an append-only row, and Peloton minutes move the home screen's bar.
 
 ### Task 2.11: Release 0.1

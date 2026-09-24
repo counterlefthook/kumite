@@ -80,4 +80,10 @@ describe("desk streak", () => {
     ["a missed workday breaks it: 1", [...full("2026-10-05"), ...full("2026-10-07")], "2026-10-08", 1],
     ["nothing logged: 0", [], "2026-10-08", 0],
   ])("%s", (_name, desk, date, expected) => expect(streak(desk, date)).toBe(expected));
+
+  it("a fight day with desk goals unmet is skipped, not a break", () => {
+    const desk = [...full("2026-10-05"), ...full("2026-10-07")];
+    const history = makeHistory([{ kind: "fight", date: "2026-10-06", minutes: 60 }], desk);
+    expect(deskStreak(LIB, PROFILE, history, at("2026-10-08", "12:00"))).toBe(2);
+  });
 });

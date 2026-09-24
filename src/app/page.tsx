@@ -1,69 +1,94 @@
-import Image from "next/image";
+import Link from "next/link";
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { planDay } from "@/engine/day";
+import { GYM_COOKIE } from "@/lib/constants";
+import { LIBRARY, loadAll } from "@/lib/data";
+import { dayLabel, DESK_NAMES } from "@/lib/view";
+import { localDate } from "@/engine/calendar";
+import { Announce, BigLink, HealthBar, Panel, Title } from "@/components/ui";
 
-export default function Home() {
+const DONE_MESSAGES: Record<string, string> = {
+  desk: "Logged. Keep chipping away.",
+  fight: "Class logged.",
+  peloton: "Peloton logged.",
+  body: "Saved.",
+  settings: "Settings saved.",
+  calibration: "Calibration saved. Starting weights are set.",
+};
+
+export default async function Home({ searchParams }: PageProps<"/">) {
+  const data = await loadAll();
+  if (!data) redirect("/signin");
+  if (!data.profile || !data.equipment) redirect("/onboarding");
+
+  const now = new Date();
+  const zone = data.profile.timezone;
+  const gymCookie = (await cookies()).get(GYM_COOKIE)?.value;
+  const day = planDay({
+    now,
+    library: LIBRARY,
+    profile: data.profile,
+    history: data.history,
+    gymToday: gymCookie === localDate(now, zone),
+  });
+  const calibrated = data.history.sessions.some((s) => s.kind === "calibration");
+  const done = (await searchParams).done;
+  const doneMessage = typeof done === "string" ? DONE_MESSAGES[done] : undefined;
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <Title sub={dayLabel(now, data.profile)} />
+
+      {doneMessage ? <p className="m-0 border-2 border-gold-700 bg-stone-950/80 p-3 text-center text-[16px] text-gold-200">{doneMessage}</p> : null}
+      {day.flawless ? <Announce>FLAWLESS</Announce> : null}
+      {!calibrated ? (
+        <Link href="/onboarding/calibrate" className="border-2 border-dashed border-gold-500 p-3 text-[16px] text-gold-200">
+          Set your starting weights: calibrate the A and B exercises.
+        </Link>
+      ) : null}
+
+      {day.fightDay ? (
+        <p className="m-0 border-2 border-gold-300 bg-blood-800 p-3 text-[17px]">
+          <b>Fight day.</b> That&apos;s your training. Desk sets are optional today.
+        </p>
+      ) : null}
+
+      <Panel title={day.desk[0].target === null ? "DESK SETS TODAY" : "TODAY AT THE DESK"}>
+        {day.desk.map((bar) => (
+          <HealthBar key={bar.slot} label={DESK_NAMES[bar.slot]} done={bar.done} target={bar.target} />
+        ))}
+      </Panel>
+
+      <Panel title="THIS WEEK">
+        <HealthBar label="Peloton" done={day.pelotonMinutes} target={day.pelotonTarget || null} unit=" min" />
+        <HealthBar label="Home workouts" done={day.homeWorkouts} target={day.homeTarget || null} />
+      </Panel>
+
+      {day.nudge ? (
+        <div className="flex gap-2.5 border-2 border-gold-300 bg-blood-800 p-3.5 text-[17px] leading-snug">
+          <span aria-hidden="true" className="font-display text-[22px] font-black leading-none text-[#ffcf3a]">!</span>
+          <span>{day.nudge}</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      ) : null}
+
+      <div className="flex flex-col gap-3">
+        <BigLink href="/desk" tone="stone">AT YOUR DESK?</BigLink>
+        {day.fightDay ? (
+          <BigLink href="/fight">LOG YOUR CLASS</BigLink>
+        ) : (
+          <BigLink href="/gym">GYM TODAY?</BigLink>
+        )}
+      </div>
+
+      <nav className="grid grid-cols-2 gap-3">
+        <Link href="/log" className="flex min-h-[52px] items-center justify-center border-2 border-gold-700 text-[17px] font-bold text-gold-300">
+          Log Peloton, weight
+        </Link>
+        <Link href="/settings" className="flex min-h-[52px] items-center justify-center border-2 border-gold-700 text-[17px] font-bold text-gold-300">
+          Settings
+        </Link>
+      </nav>
+    </>
   );
 }

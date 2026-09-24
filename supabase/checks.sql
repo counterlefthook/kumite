@@ -27,7 +27,7 @@ begin
   execute 'set local role anon';
   perform set_config('request.jwt.claims', '', true);
   foreach t in array array['profile', 'equipment', 'exercises', 'sessions', 'sets', 'desk_sets',
-    'body_metrics', 'sessions_current', 'sets_current', 'desk_sets_current', 'body_metrics_current'] loop
+    'body_metrics', 'sessions_current', 'sets_current', 'desk_sets_current', 'body_metrics_current', 'dev_notes'] loop
     begin
       execute format('select count(*) from public.%I', t) into n;
       raise exception 'CHECK FAILED: signed-out read of % was allowed', t;
@@ -45,6 +45,21 @@ begin
 
   insert into public.profile (height_in, baseline_weight_lb) values (74, 205);
   update public.profile set baseline_weight_lb = 204;
+  select count(*) into n from public.profile where peloton_minutes_week = 60 and home_workouts_week = 3;
+  if n <> 1 then raise exception 'CHECK FAILED: weekly targets did not default to 60 minutes and 3 workouts'; end if;
+
+  -- Ideas: add and read your own; no edits, and no marking your own note done.
+  insert into public.dev_notes (body, screen, app_version) values ('Bigger DONE button', '/', '0.1.0');
+  begin
+    update public.dev_notes set status = 'done';
+    raise exception 'CHECK FAILED: editing an idea was allowed';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into public.dev_notes (body, status) values ('Sneaky', 'done');
+    raise exception 'CHECK FAILED: adding an idea already marked done was allowed';
+  exception when insufficient_privilege then null;
+  end;
   insert into public.equipment (dumbbell_settings_lb, bands)
     values ('{5,10,15,20,25,30,35,40,45,50,55}', '[{"name": "heavy"}, {"name": "light"}]');
 
@@ -116,7 +131,7 @@ begin
   execute 'set local role authenticated';
   perform set_config('request.jwt.claims', json_build_object('sub', u2, 'role', 'authenticated')::text, true);
 
-  foreach t in array array['profile', 'equipment', 'sessions', 'sets', 'sessions_current', 'sets_current'] loop
+  foreach t in array array['profile', 'equipment', 'sessions', 'sets', 'sessions_current', 'sets_current', 'dev_notes'] loop
     execute format('select count(*) from public.%I', t) into n;
     if n <> 0 then raise exception 'CHECK FAILED: user 2 can see % row(s) of user 1 in %', n, t; end if;
   end loop;

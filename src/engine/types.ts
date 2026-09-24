@@ -66,6 +66,10 @@ export interface Profile {
   workStart: string;
   workEnd: string;
   deskTargets: DeskTargets;
+  /** Weekly Peloton target in minutes (rides or classes). */
+  pelotonMinutesWeek: number;
+  /** Home workouts (strength sessions) a week. */
+  homeWorkoutsWeek: number;
   timezone: string;
 }
 

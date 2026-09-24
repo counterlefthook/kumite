@@ -24,7 +24,10 @@ export interface GenerateInput {
   profile: Profile;
   equipment: Equipment;
   history: History;
-  /** Required for strength; optional for a desk break (used for the knee swap). */
+  /**
+   * Optional. Version 0.1 has no check-in (decided 2026-09-24): without one,
+   * the recovery check, leg cap, and check-in knee swap are skipped.
+   */
   checkIn: CheckIn | null;
   timeBox: TimeBox;
   /** "Train anyway" after strength yesterday; logged as override = true. */
@@ -56,9 +59,7 @@ export function generate(input: GenerateInput): Suggestion {
   const zone = profile.timezone;
 
   if (input.timeBox === "desk") return deskBreak(lib, profile, history, now, checkIn?.kneePain ?? null);
-  if (!checkIn) throw new Error("A check-in is required before a strength suggestion.");
-
-  const recovery = recoveryCheck(checkIn);
+  const recovery = checkIn ? recoveryCheck(checkIn) : null;
   if (recovery) return { kind: "recovery", options: ["ride_zone2_30", "mobility_15"], reasons: [recovery] };
 
   const reasons: string[] = [];
@@ -103,7 +104,7 @@ export function generate(input: GenerateInput): Suggestion {
     zone,
     template,
     rounds: targets.rounds,
-    kneeSwap: kneeSwapActive(checkIn),
+    kneeSwap: checkIn ? kneeSwapActive(checkIn) : false,
     pullups,
     deficits,
   };
@@ -111,7 +112,7 @@ export function generate(input: GenerateInput): Suggestion {
   reasons.push(...built.reasons);
   let blocks = built.blocks;
 
-  if (ctx.kneeSwap) {
+  if (checkIn && ctx.kneeSwap) {
     for (const [from, to] of Object.entries(lib.knee_swaps[template])) {
       if (slotLadder(ctx, from) !== to) continue;
       const swapped = blocks.flatMap((b) => b.exercises).find((e) => e.ladder === to);
@@ -123,7 +124,7 @@ export function generate(input: GenerateInput): Suggestion {
     }
   }
 
-  const cap = legCapReason(checkIn);
+  const cap = checkIn ? legCapReason(checkIn) : null;
   if (cap) {
     blocks = blocks.map((b) => ({ ...b, exercises: b.exercises.map(applyLegCap) }));
     reasons.push(cap);

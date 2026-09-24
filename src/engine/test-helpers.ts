@@ -31,6 +31,8 @@ export const PROFILE: Profile = {
   workStart: "09:00",
   workEnd: "17:00",
   deskTargets: { pushupsPerDay: 100, chairSquatsPerHour: 25, pullupSinglesPerDay: 5 },
+  pelotonMinutesWeek: 60,
+  homeWorkoutsWeek: 3,
   timezone: ZONE,
 };
 

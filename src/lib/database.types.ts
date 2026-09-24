@@ -87,6 +87,39 @@ export type Database = {
           },
         ]
       }
+      dev_notes: {
+        Row: {
+          addressed_in: string | null
+          app_version: string | null
+          body: string
+          created_at: string
+          id: string
+          screen: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          addressed_in?: string | null
+          app_version?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          screen?: string | null
+          status?: string
+          user_id?: string
+        }
+        Update: {
+          addressed_in?: string | null
+          app_version?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          screen?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       desk_sets: {
         Row: {
           created_at: string
@@ -235,6 +268,8 @@ export type Database = {
           created_at: string
           desk_targets: Json
           height_in: number
+          home_workouts_week: number
+          peloton_minutes_week: number
           program_start_date: string
           protein_target_g: number
           timezone: string
@@ -248,6 +283,8 @@ export type Database = {
           created_at?: string
           desk_targets?: Json
           height_in: number
+          home_workouts_week?: number
+          peloton_minutes_week?: number
           program_start_date?: string
           protein_target_g?: number
           timezone?: string
@@ -261,6 +298,8 @@ export type Database = {
           created_at?: string
           desk_targets?: Json
           height_in?: number
+          home_workouts_week?: number
+          peloton_minutes_week?: number
           program_start_date?: string
           protein_target_g?: number
           timezone?: string

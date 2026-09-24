@@ -1,26 +1,72 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Kumite design tokens: an original fighting-game look (dark stone, blood red,
+  fire orange, carved gold). See CLAUDE.md, Design direction.
+*/
+@theme {
+  --color-stone-950: #0d0706;
+  --color-stone-900: #150c0a;
+  --color-stone-800: #1f1410;
+  --color-stone-700: #2a1a15;
+  --color-stone-600: #3a2a22;
+  --color-blood-900: #3d0400;
+  --color-blood-800: #5c0606;
+  --color-blood-700: #7a0a0a;
+  --color-blood-600: #8e0b0b;
+  --color-blood-500: #a3120f;
+  --color-fire: #ff6000;
+  --color-gold-100: #fff0c8;
+  --color-gold-200: #f3cf6a;
+  --color-gold-300: #e9b64a;
+  --color-gold-500: #c9a45a;
+  --color-gold-700: #8a6420;
+  --color-bone: #f4ead8;
+  --color-dust: #d9c7a8;
+  --color-ash: #a8957a;
+
+  --font-display: "Cinzel", Georgia, serif;
+  --font-body: "Atkinson Hyperlegible", system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--color-stone-950);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  min-height: 100dvh;
+  margin: 0;
+  color: var(--color-bone);
+  font-family: var(--font-body);
+  background-color: var(--color-stone-900);
+  background-image:
+    radial-gradient(ellipse at 50% 108%, rgb(255 96 0 / 0.38), rgb(160 20 0 / 0.16) 38%, transparent 62%),
+    radial-gradient(ellipse at 50% 0%, transparent 40%, rgb(0 0 0 / 0.55) 100%),
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.45) 0 2px, transparent 2px 72px),
+    repeating-linear-gradient(90deg, rgb(0 0 0 / 0.35) 0 2px, transparent 2px 110px),
+    linear-gradient(180deg, #2a1a15, #1a0f0c);
+  background-attachment: fixed;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gold-text {
+  background: linear-gradient(180deg, #fff6c8 0%, #f3cf6a 38%, #9a6412 52%, #e9b64a 70%, #fff0a8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 3px 0 #3d0400) drop-shadow(0 0 10px rgb(255 90 0 / 0.35));
+}
+
+.announce {
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: #ffcf3a;
+  text-shadow: 0 4px 0 #6b0000, 0 0 18px rgb(255 110 0 / 0.6);
+  letter-spacing: 0.06em;
+}
+
+@layer base {
+  input, select, textarea, button {
+    font: inherit;
+  }
 }
