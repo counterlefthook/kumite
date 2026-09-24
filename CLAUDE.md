@@ -53,7 +53,7 @@ These repo files are the source of truth. If SPEC and PLAN disagree, or a rule i
 
 ## Design direction
 
-80s arcade in red, white, and blue with 16/32-bit pixel art. Use a pixel font for the title screen and big headings, and a highly readable font for body text and anything logged mid-set. Tap targets are at least 48 px, since logging happens between sets with sweaty hands. All art is original: no film imagery, characters, or logos.
+An original fighting-game style in the spirit of early-1990s arcade fighters: dark stone backgrounds, blood red, fire orange, and carved gold lettering, with health bars for goals and fighting-game moments (ROUND, FIGHT, FLAWLESS). Use a carved display face for the title and big headings, and a highly readable font for body text and anything logged mid-set. Tap targets are at least 48 px, since logging happens between sets with sweaty hands. All art is original: no game or film logos, names, characters, fonts, or imagery.
 
 ## Guardrails
 

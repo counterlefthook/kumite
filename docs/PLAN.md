@@ -61,7 +61,19 @@ Build the engine as pure functions with tests written alongside each rule. This 
 - [x] Write every test in the Required tests section below, as table-driven Vitest cases with plain-language names.
 - Done when: all required tests pass, and the lint rule confirms nothing in `src/engine/` imports React, Next, or Supabase.
 
-### Task 2.3: Sign-in (branch `feat/auth`)
+### Task 2.3: Kumite look and install (branch `feat/look`)
+
+Moved up from the end of the stage (decided 2026-09-24) so every screen after it is built in the Kumite style.
+
+- [ ] Design tokens (colors, fonts, spacing) defined in one place: an original fighting-game style with dark stone, blood red, fire orange, and carved gold, at strong contrast. No game or film logos, names, characters, or fonts.
+- [ ] A carved display face for the title and big headings (for example Cinzel, loaded through `next/font`), and a highly readable face for body text and logging (for example Atkinson Hyperlegible).
+- [ ] Shared pieces the later screens reuse: the gold title, a health-bar progress meter, a stone panel, and big buttons (at least 48 px, most 64 px or more).
+- [ ] A title screen replaces the Next.js starter page.
+- [ ] An original Kumite emblem as the app icon (192 px, 512 px, and a 180 px Apple touch icon).
+- [ ] Web app manifest: name, short name, theme color, and standalone display.
+- Done when: the production URL shows the Kumite title screen, and Chris adds Kumite from Safari's Share menu to his home screen and it launches full screen with the Kumite icon.
+
+### Task 2.4: Sign-in (branch `feat/auth`)
 
 - [ ] A sign-in screen with email and password through Supabase Auth, and no sign-up or forgot-password flow. Chris signs in once inside the installed app (it keeps its storage separate from Safari), and the session then refreshes itself on every visit. No emailed links or codes anywhere; a forgotten password is reset in the Supabase dashboard.
 - [ ] Use `@supabase/ssr` following Supabase's current Next.js guide for the server client, browser client, and session refresh.
@@ -69,52 +81,53 @@ Build the engine as pure functions with tests written alongside each rule. This 
 - [ ] A sign-out button in Settings.
 - Done when: Chris signs in on the installed app and is still signed in after closing and reopening it.
 
-### Task 2.4: Onboarding and calibration (branch `feat/onboarding`)
+### Task 2.5: Idea button (branch `feat/ideas`)
+
+Modeled on Baby Tracker's dev notes.
+
+- [ ] Migration `dev_notes`: `id`, `user_id`, `body`, `screen`, `app_version`, `status` (`open`, `planned`, `done`), `addressed_in`, `created_at`, with row-level security. Chris inserts and reads his own notes; status changes are made by Claude from the cloud session with the Supabase access token.
+- [ ] An idea button on every screen that opens a sheet with a text box and saves the note with the current screen and app version.
+- [ ] At the start of each later task, Claude reads the open notes and raises them with Chris; notes that ship get `status = done` and the version.
+- Done when: a note saved on the phone appears in the table with its screen and version.
+
+### Task 2.6: Onboarding and calibration (branch `feat/onboarding`)
 
 - [ ] Profile: height, weight, and a program start date that defaults to today.
 - [ ] Equipment: dumbbell settings (enter the lowest weight, highest weight, and step, or type the list), bench type, pull-up bar, and bands listed heaviest to lightest.
-- [ ] Work hours (default 9:00 to 17:00) and desk targets, prefilled with the defaults in Engine rules.
+- [ ] Work hours (default 9:00 to 17:00), desk targets, the weekly Peloton target (default 60 minutes), and home workouts a week (default 3), prefilled with the defaults in Engine rules. A migration adds `peloton_minutes_week` and `home_workouts_week` to `profile`.
 - [ ] Calibration, which can run across two sessions (the A exercises, then the B exercises), each counting as that template's first session. For rung 1 of each ladder, find the dumbbell setting done for 10 to 12 reps with 2 in reserve. Also record max push-ups, max chair squats (capped at 50), max strict pull-ups, and the heaviest band that allows 5 assisted pull-ups.
 - Done when: onboarding saves the profile and equipment rows, and the calibration sets feed the engine's starting loads.
 
-### Task 2.5: Today screen (branch `feat/today`)
+### Task 2.7: Day planner in the engine (branch `feat/day-planner`)
 
-- [ ] Check-in: leg soreness and upper-body soreness (1 to 5), energy (1 to 5), knee pain (0 to 10), and "fight training in the next 24 hours?" (yes or no).
-- [ ] Time picker: 10, 20, or 30 minutes, or a desk break.
-- [ ] The generated workout, with a plain-language reason for every adjustment (for example "Legs capped at 2 sets: fight training tomorrow").
-- [ ] Set logging: weight and reps prefilled from last time, one tap to accept, steppers to adjust, reps-in-reserve buttons (0, 1, 2, 3, 4+), a knee flag on squat-slot sets, and a rest timer between pairs.
-- [ ] "Train anyway" when a guardrail suggests rest, logged as an override.
-- Done when: Chris completes an A session and a B session on the preview URL, and the next suggestion reflects what he logged.
+- [ ] Make the check-in optional in `generate()`: with none, the recovery check, leg cap, and check-in knee swap are skipped.
+- [ ] Add `planDay()` in `src/engine/day.ts` following "Planning the day" below: the home screen's bars, the nudge, and the answer to "Gym today?".
+- [ ] Peloton minutes this week from `ride` sessions; fight days excused from desk goals in the nudge and the streak.
+- [ ] Table-driven tests for every rule in "Planning the day".
+- Done when: the new tests and all existing engine tests pass.
 
-### Task 2.6: Desk sets (branch `feat/desk-sets`)
+### Task 2.8: Home screen (branch `feat/home`)
 
-- [ ] Counters for push-ups, chair squats (glute bridges on sore-knee days), and pull-up singles, each with a one-tap button that logs one mini-set.
-- [ ] Today's totals against targets, and the workday streak.
-- Done when: tapping logs a `desk_sets` row, totals update, and a knee check-in above 3 swaps squats for bridges for that day.
+- [ ] Health bars for today's desk goals, and this week's Peloton minutes and home workouts.
+- [ ] The nudge line from `planDay()`.
+- [ ] "At your desk?": the one desk exercise to do now, huge, with a DONE button that logs a `desk_sets` row; FLAWLESS when every desk goal for the day is met.
+- [ ] "Gym today?": yes shows the fight day screen with a button to log the class; no shows the suggestion from `planDay()`.
+- Done when: Chris logs desk sets from the phone and the bars fill, and both gym answers show the right screen.
 
-### Task 2.7: Fight sessions, rides, and body metrics (branch `feat/other-logs`)
+### Task 2.9: Home workout (branch `feat/workout`)
 
-- [ ] Fight session: kickboxing or MMA, minutes, effort (1 to 10), and estimated calories.
-- [ ] Ride: minutes, Peloton output (kJ), Peloton's calorie figure, and effort.
+- [ ] "OK, here's what we're going to do": the workout from `generate()` as one line per exercise with weight, sets, and reps.
+- [ ] Set logging: weight and reps prefilled from the plan, one tap to accept, steppers to adjust, reps-in-reserve buttons (0, 1, 2, 3, 4+), a knee flag on squat-slot sets, and a rest timer between pairs.
+- Done when: Chris completes an A session and a B session, and the next suggestion reflects what he logged.
+
+### Task 2.10: Fight classes, Peloton, and body metrics (branch `feat/other-logs`)
+
+- [ ] Fight class: kickboxing or MMA, minutes, effort (1 to 10), and estimated calories.
+- [ ] Peloton: ride or class, minutes, and for rides Peloton's output (kJ) and calorie figure. Saved as `ride` sessions.
 - [ ] Body metrics: morning weight (daily, optional) and waist (weekly).
-- Done when: each saves as an append-only row and appears in the week view.
+- Done when: each saves as an append-only row, and Peloton minutes move the home screen's bar.
 
-### Task 2.8: Week view (branch `feat/week`)
-
-- [ ] Hard sets per group against the week's target, with a pace marker.
-- [ ] Strength sessions done out of 3, fight sessions, rides, and desk totals.
-- [ ] Pull-up progress: current stage and the latest max against the 5, 8, and 10 milestones.
-- Done when: the numbers match a hand count of the week's logs.
-
-### Task 2.9: Kumite look and install (branch `feat/look`)
-
-- [ ] Design tokens (colors, fonts, spacing) defined in one place: red, white, and blue on a dark navy base with strong contrast.
-- [ ] A pixel font for the title screen and big headings (for example Press Start 2P or Pixelify Sans, loaded through `next/font`), and a highly readable font for body text and logging.
-- [ ] An original 16-bit Kumite emblem as the app icon (192 px, 512 px, and a 180 px Apple touch icon).
-- [ ] Web app manifest: name, short name, theme color, and standalone display.
-- Done when: Chris adds Kumite from Safari's Share menu to his home screen, and it launches full screen with the Kumite icon.
-
-### Task 2.10: Release 0.1
+### Task 2.11: Release 0.1
 
 - [ ] Merge to `main`, tag `v0.1.0`, and confirm the production deploy.
 - [ ] Chris installs the production app, runs onboarding, and completes calibration.
@@ -130,19 +143,32 @@ Config tables are editable. Log tables are append-only: corrections are new rows
 
 | Table | Kind | Columns |
 | --- | --- | --- |
-| `profile` | Config, one row per user | `user_id` (primary key, references `auth.users`), `height_in`, `baseline_weight_lb`, `program_start_date`, `protein_target_g` (default 185), `work_start` (default 09:00), `work_end` (default 17:00), `desk_targets` (jsonb, defaults below), `timezone` (default America/Chicago), `created_at`, `updated_at` |
+| `profile` | Config, one row per user | `user_id` (primary key, references `auth.users`), `height_in`, `baseline_weight_lb`, `program_start_date`, `protein_target_g` (default 185), `work_start` (default 09:00), `work_end` (default 17:00), `desk_targets` (jsonb, defaults below), `peloton_minutes_week` (default 60), `home_workouts_week` (default 3), `timezone` (default America/Chicago), `created_at`, `updated_at` |
 | `equipment` | Config, one row per user | `user_id` (primary key), `dumbbell_settings_lb` (numeric array, ascending), `bench` (`flat` or `adjustable`), `pullup_bar` (boolean), `bands` (jsonb array, heaviest to lightest), `updated_at` |
 | `exercises` | Seeded, read-only | `id` (text primary key), `name`, `ladder`, `rung`, `grp`, `load`, `dumbbells`, `equipment` (text array), `context` (text array), `unilateral`, `rep_min`, `rep_max`, `sec_min`, `sec_max`, `knee`, `cue` |
 | `sessions` | Log | `id` (uuid), `user_id`, `kind` (`strength`, `fight`, `ride`, `mobility`, `calibration`, `max_test`), `template` (`A`, `B`, or null), `started_at`, `minutes`, `time_box` (`10`, `20`, `30`, or null), `check_in` (jsonb: `soreness_legs`, `soreness_upper`, `energy`, `knee_pain`, `fight_next_24h`), `effort`, `fight_type`, `ride_output_kj`, `ride_kcal`, `override` (boolean), `notes`, `supersedes`, `voided`, `created_at` |
 | `sets` | Log | `id`, `user_id`, `session_id`, `exercise_id`, `set_index`, `weight_lb` (per dumbbell), `band`, `reps`, `seconds`, `rir` (0 to 4, where 4 means 4 or more), `knee_flag`, `supersedes`, `voided`, `created_at` |
 | `desk_sets` | Log | `id`, `user_id`, `exercise_id`, `reps`, `seconds` (wall sits), `logged_at`, `supersedes`, `voided`, `created_at` |
 | `body_metrics` | Log | `id`, `user_id`, `kind` (`weight_lb` or `waist_in`), `value`, `measured_at`, `supersedes`, `voided`, `created_at` |
+| `dev_notes` | Feedback (Task 2.5) | `id`, `user_id`, `body`, `screen`, `app_version`, `status` (`open`, `planned`, `done`), `addressed_in`, `created_at` |
 
 Policies: config tables allow select, insert, and update on the user's own row. `exercises` allows select for signed-in users. Log tables allow select and insert only.
 
 ## Engine rules
 
 These are the precise, testable versions of the rules in `docs/SPEC.md`.
+
+### Planning the day
+
+Version 0.1 has no check-in (decided 2026-09-24). The rules that need one stay in the engine but are switched off: the recovery check, the leg cap, and the knee swap at check-in. The knee flag on a logged set still applies. Without check-ins, recovery never counts as holding, so weeks 5 onward use 9 hard sets and 3 rounds.
+
+- Home screen: today's desk goals on workdays (Desk sets below), Peloton minutes this week against the weekly target (default 60), and home workouts (strength sessions) this week against the weekly target (default 3).
+- "At your desk?": the desk break rule in step 4 below.
+- "Gym today?", yes: a fight day. Nothing else is suggested. The class logs afterward as a `fight` session. Desk sets can still be logged, but that day's desk goals are excused: the nudge ignores them and the streak skips the day.
+- "Gym today?", no: compare the share done this week, home workouts ÷ target and Peloton minutes ÷ target. The lower share wins; a tie goes to the home workout. A home workout is not offered the day after one (step 2 below) unless the quota squeeze applies (step 6); then the Peloton is offered if it is short, else a rest day. With both targets met, it is a rest day with desk sets optional.
+- The home workout is the 30-minute box (step 4), or the 20-minute box on a squeeze day. There is no time picker in 0.1.
+- Nudge: while Peloton minutes are short, "You still need N minutes on the Peloton this week: a class or a ride." When desk sets were logged today, it starts "You've done some desk sets, but".
+- Fight days are known from a `fight` session logged that day, or from "Gym today?" answered yes.
 
 ### Definitions
 
@@ -250,4 +276,6 @@ Evaluated from the most recent session that included the exercise. The current s
 
 Ideas and gaps captured during the build go here instead of into the current task.
 
-- Idea button (2026-09-24, from Chris): an "idea" button on every screen, like Baby Tracker's dev notes. It opens a sheet with a text box and saves the note to a `dev_notes` table with the screen, the app version, a status (open, planned, done), and the version it was addressed in. Claude reads open notes from the cloud session with the Supabase access token at the start of each task and marks them done when shipped, so no secret export link is needed. Needs sign-in (Task 2.3) and a migration; suggested as its own task right after 2.3.
+- Week view (moved out of 0.1 on 2026-09-24): hard sets per group against the week's target with a pace marker, fight sessions, and pull-up progress against the 5, 8, and 10 milestones. The home screen covers the week's goals for now.
+- Time picker (10 or 20-minute workouts on busy days) and the check-in rules: both still in the engine, switched off in 0.1.
+

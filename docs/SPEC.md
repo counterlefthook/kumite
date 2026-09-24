@@ -14,7 +14,7 @@ The app picks a workout that fits Chris's available time and home equipment, the
 
 Baseline at kickoff (September 2026): age 45, 6'2", about 205 lb, works from home. Version 0.1 is single-user.
 
-Look and feel: an 80s arcade style in red, white, and blue with 16/32-bit pixel art. Working name: Kumite (repo kumite), after the Bloodsport tournament and the karate word for sparring.
+Look and feel: an original fighting-game style in the spirit of early-1990s arcade fighters: dark stone, blood red, fire, and carved gold lettering, with health bars for goals. All art is original, with no game or film logos, names, characters, or fonts. Working name: Kumite (repo kumite), after the Bloodsport tournament and the karate word for sparring.
 
 ## Inputs
 
@@ -26,10 +26,10 @@ The engine plans around these, set at onboarding and editable in Settings. Dumbb
 | Bench | Adjustable, flat to incline | Flat and incline press, chest-supported rows, box squats, split squats, hip thrusts |
 | Pull-up bar | Doorway bar, plus resistance bands | Pull-up progression toward 10 strict reps |
 | Peloton bike | Yes | Easy rides and conditioning |
-| Fight training | Kickboxing or MMA, 2 to 3 sessions a week, on days that change weekly | Logged as they happen; recovery guardrails |
+| Fight training | Kickboxing or MMA at the gym, 2 to 3 sessions a week, on days that change weekly | A gym day is that day's training; logged as it happens |
 | Workday | At home | Desk sets through the day |
-| Session length | 10, 20, or 30 minutes, or a desk break | Time boxes |
-| Knee | Five prior surgeries; squats and lunges OK | Knee-friendly defaults and a knee check-in |
+| Session length | 30-minute home workouts (20 when the week runs short), or a desk break | Time boxes |
+| Knee | Five prior surgeries; squats and lunges OK | Knee-friendly defaults and a knee flag on squat sets |
 
 ## Weekly structure and session templates
 
@@ -37,13 +37,13 @@ Each week holds three 30-minute strength sessions, 2 to 3 fight sessions, 1 to 2
 
 | Per week | Target | Scheduling rule |
 | --- | --- | --- |
-| Strength | 3 sessions, alternating A and B | At least one day between sessions |
-| Fight training | 2 to 3, logged as they happen | Leg sets drop to 2 when fight training is within 24 hours |
-| Easy rides | 1 to 2, 30 to 45 minutes | Fill days with no strength or fight training |
+| Home workouts | 3 sessions, alternating A and B | At least one day between sessions |
+| Fight training | 2 to 3, logged as they happen | A gym day is the day's training; nothing else is suggested |
+| Peloton | 60 minutes, rides or classes | Suggested on no-gym days when it is further behind than home workouts |
 | Desk sets | Every workday | Run alongside everything else |
 | Rest | At least 1 full day | No strength or fight training |
 
-When the week runs short on days, the engine drops a ride first, then trims a strength session to 20 minutes.
+When the week runs short on days, the engine allows home workouts on back-to-back days in the 20-minute box.
 
 | Session | Pair 1 | Pair 2 | Finisher |
 | --- | --- | --- | --- |
@@ -55,7 +55,7 @@ When the week runs short on days, the engine drops a ride first, then trims a st
 - Rep ranges: 8 to 12 on dumbbell lifts, 10 to 15 on single-leg and bodyweight moves.
 - Every working set ends with 1 to 2 reps in reserve (reps you could still have done).
 - Optional 5-minute arm finisher when time allows: curls paired with overhead triceps extensions.
-- Rides stay mostly in Zone 2 (easy enough to talk in full sentences), with at most one harder ride a week after a good check-in.
+- Peloton sessions can be rides or classes; any Peloton minutes count toward the weekly 60.
 - Desk sets default to 100 push-ups a day, 25 chair squats an hour during work hours, and easy pull-up singles on the doorway bar. Each mini-set is about half the current max, and none count as hard sets. On a sore-knee day, glute bridges replace the squats.
 
 Weekly targets count hard sets in four groups: push (chest, shoulders, triceps), pull (back, biceps), squat (quads), and hinge (glutes, hamstrings). An A, B, A week at 3 rounds gives about 9 per group. Targets run 6 in weeks 1 and 2, 9 in weeks 3 and 4, and 12 from week 5 when recovery holds (check-in averages of soreness 3 or lower and energy 3 or higher over the prior two weeks).
@@ -105,15 +105,14 @@ Easy singles on the doorway bar through the workday add practice without much fa
 
 ## Suggestion engine
 
-Given the minutes available and a 10-second check-in, the engine returns a workout using fixed rules and no model. The A and B templates are the default; pace decides what makes the cut when time is short or a session was missed.
+The app asks as little as possible. The home screen shows today's desk goals as health bars, this week's Peloton minutes and home workouts, and a nudge about whatever is behind. Two questions do the rest. Fixed rules, no model.
 
-1. Inputs: minutes available (10, 20, 30, or a desk break) and the check-in. The check-in rates soreness and energy from 1 to 5 and knee pain from 0 to 10. It also asks whether fight training is coming in the next 24 hours.
-2. Context: the engine also reads the last logged fight session, plus this week's hard sets per muscle group.
-3. Filter: keep exercises that match the equipment and context. A desk break only offers moves done in work clothes without a shower: squats, push-ups, wall sits, calf raises.
-4. Pace: each muscle group has a weekly target of hard sets. Groups furthest behind pace fill first, where pace = target × days elapsed ÷ 7.
-5. Guardrails: leg soreness of 4 or more, or fight training within 24 hours, caps leg work at 2 sets ending 2 or more reps short. Upper-body soreness of 4 or more, or energy of 2 or less, swaps in an easy ride or mobility. Knee pain above 3, at check-in or flagged on a set, swaps the squat slot for hip-dominant work and drops that exercise one rung next time.
-6. Time box: 30 minutes gets both pairs plus the finisher, and 20 gets both pairs without it. 10 minutes gets one pair as EMOM (start a set at the top of each minute, rest for the remainder).
-7. Output: exercises in order, each with target weight, rep range, rounds, and rest at the current progression step.
+1. "At your desk?": one thing to do now, the desk exercise furthest behind its daily goal, sized as a mini-set. One tap logs it. Filling every desk goal for the day shows FLAWLESS.
+2. "Gym today?" (the kickboxing or MMA gym): yes means that is the day's training. Nothing else is suggested, the class is logged afterward, and desk sets stay available but that day's desk goals do not count against the nudge or the streak.
+3. No gym: the app suggests whatever is furthest behind this week, comparing home workouts (3) with Peloton minutes (60) as a share of each target. A home workout comes with "OK, here's what we're going to do" and the exercises; a Peloton suggestion names the minutes still needed. With both done, it is a rest day, with desk sets if wanted.
+4. Nudge: whenever Peloton minutes are short for the week, the home screen says so, for example "You've done some desk sets, but you still need 50 minutes on the Peloton this week: a class or a ride."
+5. The home workout: the A and B templates at the current progression step, 30 minutes (both pairs and the finisher), with each exercise's weight, reps, and sets. A knee flag on a squat set still swaps the rest of that exercise and drops it one rung next time.
+6. No check-in in 0.1. The soreness, energy, knee, and fight-tomorrow rules stay in the engine but are switched off.
 
 Calendar-aware slot suggestions come later (see Plan).
 
@@ -142,7 +141,7 @@ A recomp shows up as waist down and strength up while weight holds roughly stead
 | Desk-set totals and streak | Desk sets | Daily habit |
 | Protein vs target | Food log | Muscle support, once food tracking ships |
 | Max strict pull-ups | Max test every 2 to 3 weeks | Progress toward 10 |
-| Knee pain | Check-ins and set flags | Whether lower-body load suits the knee |
+| Knee pain | Set flags | Whether lower-body load suits the knee |
 
 ```latex
 \text{e1RM} = w \times \left(1 + \frac{r}{30}\right)
@@ -201,7 +200,7 @@ Same stack and pattern as Baby Tracker: Next.js on Vercel, Supabase, a GitHub re
 
 ## Decisions
 
-Thirty decisions so far; new ones get appended with their date.
+Thirty-seven decisions so far; new ones get appended with their date.
 
 | Date | Decision | Why |
 | --- | --- | --- |
@@ -235,6 +234,13 @@ Thirty decisions so far; new ones get appended with their date.
 | 2026-09-24 | Core and arm finishers run at the week's rounds | Chris's pick; keeps every block on the same schedule |
 | 2026-09-24 | Fight calories use Compendium code 15430 (martial arts, moderate pace, MET 10.3) for every session | Kickboxing and MMA sit under martial arts; one value keeps it simple |
 | 2026-09-24 | The recovery check uses upper-body soreness and energy; sore legs alone get the leg cap and still train | As first written, overall soreness meant sore legs always forced an easy day, so the leg cap could never apply |
+| 2026-09-24 | A home screen with desk goals and two questions ("At your desk?" and "Gym today?") replaces the check-in and time picker | Chris found the first mockup too complicated; the rules stay, the screen asks less |
+| 2026-09-24 | "Gym" means the kickboxing or MMA gym; a gym day is that day's training, and desk sets are optional that day | Chris does nothing else on fight days |
+| 2026-09-24 | Peloton goal of 60 minutes a week, rides or classes, replaces 1 to 2 easy rides | Chris's pick; minutes are simple to track and nudge on |
+| 2026-09-24 | On a no-gym day the app suggests whichever is further behind: home workouts (3 a week) or Peloton minutes | Keeps the week balanced without Chris planning it |
+| 2026-09-24 | No check-in in 0.1: the recovery, leg-cap, and knee check-in rules are switched off; the knee flag on a set stays | Chris wants no questions up front; the rules stay in the engine for later |
+| 2026-09-24 | Look: an original fighting-game style in the spirit of early-1990s arcade fighters (dark stone, blood red, fire, gold) replaces red, white, and blue | Chris's pick after the second mockup; no game or film logos, names, characters, or fonts |
+| 2026-09-24 | Task order: the look comes first, the idea button becomes a task, and the week view moves to the Parking lot | Chris wants to see Kumite early; the home screen now shows the week |
 
 ## Plan
 
@@ -242,7 +248,7 @@ Version 0.1 ships the workout core, food arrives in 0.2, and photo estimation st
 
 | Version | Scope |
 | --- | --- |
-| 0.1 | Onboarding and calibration session, workout generator with 10, 20, and 30-minute time boxes, check-in guardrails, set logging, progression rules, desk-set counters, weekly sets per muscle group |
+| 0.1 | Onboarding and calibration, a home screen with desk goals and the "At your desk?" and "Gym today?" questions, the home workout with set logging and progression, Peloton and fight-class logging, an idea button |
 | 0.2 | Manual food entry with the parse and lookup layer (food library and USDA), protein and calorie targets, daily totals |
 | 0.3 | Dashboard: 7-day weight, waist, estimated 1-rep max charts; a lighter deload week every 6 to 8 weeks |
 | 0.4 | FatSecret and Open Food Facts, barcode scanning, hourly desk-set nudges by web push |
