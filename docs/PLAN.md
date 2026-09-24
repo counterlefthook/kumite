@@ -46,9 +46,10 @@ Claude Code:
 
 - [ ] Migration `init`: the tables in the Schema section below, with row-level security. New tables are not exposed automatically, so the migration also grants each table's allowed actions to the `authenticated` role, matching the policies (log tables get select and insert only). The `anon` role gets no grants on user tables.
 - [ ] Migration `seed_exercises`: insert every exercise from `docs/exercise-library.json`. Generate the SQL from the JSON with a small script checked into `scripts/`, so the seed can be regenerated if the library changes.
-- [ ] A `*_current` view for each log table that hides superseded rows. Create each view with `security_invoker = true`; without it, a Postgres view runs with its owner's permissions and skips row-level security.
+- [ ] A `*_current` view for each log table that hides superseded and voiding rows. Create each view with `security_invoker = true`; without it, a Postgres view runs with its owner's permissions and skips row-level security.
+- [ ] Checks in `supabase/checks.sql`: signed-out access refused, own rows only, no edits or deletes on logs, corrections and voids, value limits. `npm test` runs them against a local Postgres (PGlite) with every migration applied; `node scripts/check-db.mjs` runs them against the hosted project.
 - [ ] Push the migrations and generate TypeScript types into `src/lib/database.types.ts`.
-- Done when: the migrations apply cleanly, a request with the publishable key and no signed-in user returns zero rows from every user table, and the exercises table reads back all 36 exercises.
+- Done when: the migrations apply cleanly, a request with the publishable key and no signed-in user is refused by every table and view, a signed-in user reads back all 36 exercises, and `node scripts/check-db.mjs` passes.
 
 ### Task 2.2: Workout engine (branch `feat/engine`)
 
@@ -125,17 +126,17 @@ Use Kumite for one to two weeks before starting food tracking (0.2). Real use wi
 
 ## Schema
 
-Config tables are editable. Log tables are append-only: corrections are new rows that point at the old row through `supersedes`. Every table has row-level security; users read and write only rows where `user_id = auth.uid()`.
+Config tables are editable. Log tables are append-only: corrections are new rows that point at the old row through `supersedes`, and a correction with `voided = true` cancels the old row. The `*_current` views hide superseded and voiding rows. Every table has row-level security; users read and write only rows where `user_id = auth.uid()`.
 
 | Table | Kind | Columns |
 | --- | --- | --- |
 | `profile` | Config, one row per user | `user_id` (primary key, references `auth.users`), `height_in`, `baseline_weight_lb`, `program_start_date`, `protein_target_g` (default 185), `work_start` (default 09:00), `work_end` (default 17:00), `desk_targets` (jsonb, defaults below), `timezone` (default America/Chicago), `created_at`, `updated_at` |
 | `equipment` | Config, one row per user | `user_id` (primary key), `dumbbell_settings_lb` (numeric array, ascending), `bench` (`flat` or `adjustable`), `pullup_bar` (boolean), `bands` (jsonb array, heaviest to lightest), `updated_at` |
 | `exercises` | Seeded, read-only | `id` (text primary key), `name`, `ladder`, `rung`, `grp`, `load`, `dumbbells`, `equipment` (text array), `context` (text array), `unilateral`, `rep_min`, `rep_max`, `sec_min`, `sec_max`, `knee`, `cue` |
-| `sessions` | Log | `id` (uuid), `user_id`, `kind` (`strength`, `fight`, `ride`, `mobility`, `calibration`, `max_test`), `template` (`A`, `B`, or null), `started_at`, `minutes`, `time_box` (`10`, `20`, `30`, or null), `check_in` (jsonb: `soreness_legs`, `soreness_upper`, `energy`, `knee_pain`, `fight_next_24h`), `effort`, `fight_type`, `ride_output_kj`, `ride_kcal`, `override` (boolean), `notes`, `supersedes`, `created_at` |
-| `sets` | Log | `id`, `user_id`, `session_id`, `exercise_id`, `set_index`, `weight_lb` (per dumbbell), `band`, `reps`, `seconds`, `rir` (0 to 4, where 4 means 4 or more), `knee_flag`, `supersedes`, `created_at` |
-| `desk_sets` | Log | `id`, `user_id`, `exercise_id`, `reps`, `logged_at`, `supersedes`, `created_at` |
-| `body_metrics` | Log | `id`, `user_id`, `kind` (`weight_lb` or `waist_in`), `value`, `measured_at`, `supersedes`, `created_at` |
+| `sessions` | Log | `id` (uuid), `user_id`, `kind` (`strength`, `fight`, `ride`, `mobility`, `calibration`, `max_test`), `template` (`A`, `B`, or null), `started_at`, `minutes`, `time_box` (`10`, `20`, `30`, or null), `check_in` (jsonb: `soreness_legs`, `soreness_upper`, `energy`, `knee_pain`, `fight_next_24h`), `effort`, `fight_type`, `ride_output_kj`, `ride_kcal`, `override` (boolean), `notes`, `supersedes`, `voided`, `created_at` |
+| `sets` | Log | `id`, `user_id`, `session_id`, `exercise_id`, `set_index`, `weight_lb` (per dumbbell), `band`, `reps`, `seconds`, `rir` (0 to 4, where 4 means 4 or more), `knee_flag`, `supersedes`, `voided`, `created_at` |
+| `desk_sets` | Log | `id`, `user_id`, `exercise_id`, `reps`, `seconds` (wall sits), `logged_at`, `supersedes`, `voided`, `created_at` |
+| `body_metrics` | Log | `id`, `user_id`, `kind` (`weight_lb` or `waist_in`), `value`, `measured_at`, `supersedes`, `voided`, `created_at` |
 
 Policies: config tables allow select, insert, and update on the user's own row. `exercises` allows select for signed-in users. Log tables allow select and insert only.
 

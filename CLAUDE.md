@@ -31,7 +31,7 @@ These repo files are the source of truth. If SPEC and PLAN disagree, or a rule i
 
 1. The workout engine lives in `src/engine/` and is pure TypeScript. No React, Next, Supabase, network calls, or `Date.now()` inside it. The current time, settings, and log history are passed in as arguments, so the same inputs always produce the same output.
 2. No AI model is involved in workout logic. The only model use in the app is parsing typed food entries in version 0.2, on the server.
-3. Log tables (`sessions`, `sets`, `desk_sets`, `body_metrics`) are append-only. A correction is a new row whose `supersedes` column points at the row it replaces. Current loads, ladder rungs, weekly set counts, streaks, and calorie estimates are computed when read and never stored.
+3. Log tables (`sessions`, `sets`, `desk_sets`, `body_metrics`) are append-only. A correction is a new row whose `supersedes` column points at the row it replaces; a correction with `voided = true` cancels the old row instead. Current loads, ladder rungs, weekly set counts, streaks, and calorie estimates are computed when read and never stored.
 4. Row-level security is on for every table, and users only see and write their own rows. Log tables get no update or delete policies.
 5. Secrets live only in environment variables. Server-only values never get the `NEXT_PUBLIC_` prefix. Never commit `.env` files.
 6. Units are pounds and inches in the database and the UI. Convert to kilograms only inside formulas that need it (calorie estimates, protein targets).
@@ -47,6 +47,8 @@ These repo files are the source of truth. If SPEC and PLAN disagree, or a rule i
 - `npx supabase migration new <name>`: create a new migration file
 - `npx supabase db push`: apply migrations to the hosted Supabase project
 - `npx supabase gen types typescript --linked > src/lib/database.types.ts`: regenerate database types after a migration
+- `node scripts/build-seed.mjs > supabase/migrations/<timestamp>_seed_exercises.sql`: regenerate the exercise seed after changing `docs/exercise-library.json`
+- `node scripts/check-db.mjs`: run the permission and row-level security checks in `supabase/checks.sql` against the hosted project (needs `SUPABASE_ACCESS_TOKEN`)
 
 ## Design direction
 

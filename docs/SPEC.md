@@ -194,14 +194,14 @@ Same stack and pattern as Baby Tracker: Next.js on Vercel, Supabase, a GitHub re
 | foods | Food library and lookup cache | Source, source ID, nutrients per 100 g, portion weights |
 | food\_log | What was eaten | Food, grams, calorie and protein snapshot, raw text, confidence |
 
-- Logs are append-only, and a correction is a new row. Current weights, progression steps, weekly sets, and streaks are derived at read time.
+- Logs are append-only, and a correction is a new row; a correction can also void a row logged by mistake. Current weights, progression steps, weekly sets, and streaks are derived at read time.
 - Server-side route handlers on Vercel hold the Anthropic and USDA keys as environment variables; no key ships to the browser.
 - Row-level security on every table, with Supabase Auth for a single user: one email-and-password account, signed in once per device and kept signed in by the session refresh. No emailed links or codes.
 - The workout engine is plain TypeScript with unit tests on the progression and pacing rules.
 
 ## Decisions
 
-Twenty-one decisions so far; new ones get appended with their date.
+Twenty-four decisions so far; new ones get appended with their date.
 
 | Date | Decision | Why |
 | --- | --- | --- |
@@ -226,6 +226,9 @@ Twenty-one decisions so far; new ones get appended with their date.
 | 2026-09-23 | Weekly set targets count four groups: push, pull, squat, hinge | Matches the four main movement slots |
 | 2026-09-24 | Sign-in is one email-and-password account, created in the Supabase dashboard with sign-ups off; replaces emailed 6-digit codes | Chris wants to stay signed in with no links or codes. Simpler than codes, and unlike Baby Tracker's anonymous sign-in, a wiped phone or new phone gets the history back by signing in again |
 | 2026-09-24 | Supabase project settings: Data API on, automatic RLS on, new tables not exposed automatically | Migrations grant each table's actions on purpose, so log tables stay select and insert only at the permission level as well as in RLS |
+| 2026-09-24 | Log tables get a `voided` column: a correction row with `voided = true` cancels the row it supersedes | A set logged by mistake needs a way out while the log stays append-only |
+| 2026-09-24 | `desk_sets` also records seconds | Wall sits are a desk-break option and are timed, not counted |
+| 2026-09-24 | Claude runs database commands from the cloud session with a Supabase access token, on one branch per PLAN task | Chris is not always at his PC; the same checks run locally in tests and against the hosted project |
 
 ## Plan
 
