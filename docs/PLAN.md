@@ -129,7 +129,7 @@ Modeled on Baby Tracker's dev notes.
 
 ### Task 2.11: Release 0.1
 
-- [ ] Merge to `main`, tag `v0.1.0`, and confirm the production deploy.
+- [x] Merge to `main`, tag `v0.1.0`, and confirm the production deploy.
 - [ ] Chris installs the production app, runs onboarding, and completes calibration.
 - Done when: Chris logs his first real session on production.
 
