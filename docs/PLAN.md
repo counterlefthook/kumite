@@ -30,8 +30,8 @@ Chris, in the Supabase dashboard:
 - [x] In the Authentication sign-in settings, turn off Allow new users to sign up. The app has a sign-in screen and no sign-up screen.
 
 Claude Code:
-- [ ] Run `npx supabase init`, then `npx supabase link --project-ref <ref>`. Chris supplies the project ref and database password when prompted.
-- [ ] Create `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and confirm git ignores it.
+- [x] Run `npx supabase init`, then `npx supabase link --project-ref <ref>`. Chris supplies the project ref and database password when prompted.
+- [x] Create `.env.local` with `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, and confirm git ignores it.
 - Done when: `npx supabase migration list` connects to the hosted project without errors.
 
 ### Task 1.4: Vercel
