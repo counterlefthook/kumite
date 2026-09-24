@@ -16,8 +16,8 @@ Each task runs the same way: a branch, a plan-mode review with Chris, the build,
 
 ### Task 1.2: GitHub
 
-- [ ] Create a private repo named `kumite` on Chris's counterlefthook GitHub account. If the GitHub CLI (`gh`) is installed and signed in, use `gh repo create`. Otherwise Chris creates an empty private repo on github.com (no README, no .gitignore, no license) and Claude Code adds it as the remote.
-- [ ] Push `main`.
+- [x] Create a private repo named `kumite` on Chris's counterlefthook GitHub account. If the GitHub CLI (`gh`) is installed and signed in, use `gh repo create`. Otherwise Chris creates an empty private repo on github.com (no README, no .gitignore, no license) and Claude Code adds it as the remote.
+- [x] Push `main`.
 - Done when: the code shows up on GitHub.
 
 ### Task 1.3: Supabase
