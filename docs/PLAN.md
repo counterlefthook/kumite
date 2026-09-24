@@ -23,9 +23,11 @@ Each task runs the same way: a branch, a plan-mode review with Chris, the build,
 ### Task 1.3: Supabase
 
 Chris, in the Supabase dashboard:
-- [ ] Create a project named `kumite` in the East US (North Virginia) region, which sits next to Vercel's default function region, so database calls stay short. Save the database password in a password manager.
+- [ ] Create a project named `kumite` in the East US (North Virginia) region, which sits next to Vercel's default function region, so database calls stay short. Use the same Supabase account and organization as Baby Tracker; each app gets its own project. Save the database password in a password manager.
+- [ ] Security options when creating the project: Enable Data API on, Enable automatic RLS on, Automatically expose new tables off. Migrations grant access table by table (see Task 2.1).
 - [ ] Copy the project URL and the publishable key from the project's API settings.
-- [ ] In the Auth email templates, edit the magic link template so it sends the 6-digit code (`{{ .Token }}`) instead of a link. Task 2.3 explains why.
+- [ ] In Authentication, Users, choose Add user, then Create new user: Chris's email, a strong password saved in the password manager, and Auto Confirm User on, so no confirmation email is sent.
+- [ ] In the Authentication sign-in settings, turn off Allow new users to sign up. The app has a sign-in screen and no sign-up screen.
 
 Claude Code:
 - [ ] Run `npx supabase init`, then `npx supabase link --project-ref <ref>`. Chris supplies the project ref and database password when prompted.
@@ -42,7 +44,7 @@ Claude Code:
 
 ### Task 2.1: Schema and seed data (branch `feat/schema`)
 
-- [ ] Migration `init`: the tables in the Schema section below, with row-level security.
+- [ ] Migration `init`: the tables in the Schema section below, with row-level security. New tables are not exposed automatically, so the migration also grants each table's allowed actions to the `authenticated` role, matching the policies (log tables get select and insert only). The `anon` role gets no grants on user tables.
 - [ ] Migration `seed_exercises`: insert every exercise from `docs/exercise-library.json`. Generate the SQL from the JSON with a small script checked into `scripts/`, so the seed can be regenerated if the library changes.
 - [ ] A `*_current` view for each log table that hides superseded rows. Create each view with `security_invoker = true`; without it, a Postgres view runs with its owner's permissions and skips row-level security.
 - [ ] Push the migrations and generate TypeScript types into `src/lib/database.types.ts`.
@@ -60,10 +62,10 @@ Build the engine as pure functions with tests written alongside each rule. This 
 
 ### Task 2.3: Sign-in (branch `feat/auth`)
 
-- [ ] Email sign-in with a 6-digit code through Supabase Auth. Codes instead of magic links because an app installed on the iPhone home screen keeps its storage separate from Safari: a magic link would sign in Safari, and the installed app would stay signed out.
+- [ ] A sign-in screen with email and password through Supabase Auth, and no sign-up or forgot-password flow. Chris signs in once inside the installed app (it keeps its storage separate from Safari), and the session then refreshes itself on every visit. No emailed links or codes anywhere; a forgotten password is reset in the Supabase dashboard.
 - [ ] Use `@supabase/ssr` following Supabase's current Next.js guide for the server client, browser client, and session refresh.
 - [ ] Every route requires sign-in except the sign-in page, the manifest, and icons.
-- [ ] After Chris's account exists, Chris turns off new sign-ups in the Supabase Auth settings.
+- [ ] A sign-out button in Settings.
 - Done when: Chris signs in on the installed app and is still signed in after closing and reopening it.
 
 ### Task 2.4: Onboarding and calibration (branch `feat/onboarding`)

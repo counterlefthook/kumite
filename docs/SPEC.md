@@ -1,6 +1,6 @@
 # Kumite: v0.1 spec
 
-Started 2026-09-22. Last updated 2026-09-23. Owner: Chris.
+Started 2026-09-22. Last updated 2026-09-24. Owner: Chris.
 
 In the repo, this file is the source of truth for product rules. `docs/PLAN.md` turns these rules into build tasks and precise engine rules.
 
@@ -196,12 +196,12 @@ Same stack and pattern as Baby Tracker: Next.js on Vercel, Supabase, a GitHub re
 
 - Logs are append-only, and a correction is a new row. Current weights, progression steps, weekly sets, and streaks are derived at read time.
 - Server-side route handlers on Vercel hold the Anthropic and USDA keys as environment variables; no key ships to the browser.
-- Row-level security on every table, with Supabase Auth for a single user.
+- Row-level security on every table, with Supabase Auth for a single user: one email-and-password account, signed in once per device and kept signed in by the session refresh. No emailed links or codes.
 - The workout engine is plain TypeScript with unit tests on the progression and pacing rules.
 
 ## Decisions
 
-Nineteen decisions so far; new ones get appended with their date.
+Twenty-one decisions so far; new ones get appended with their date.
 
 | Date | Decision | Why |
 | --- | --- | --- |
@@ -224,6 +224,8 @@ Nineteen decisions so far; new ones get appended with their date.
 | 2026-09-23 | Look: 80s arcade, red, white, and blue, 16/32-bit pixel art | Chris's direction; name still open |
 | 2026-09-23 | Working name Kumite, repo kumite | Chris's pick; nods to Bloodsport and the karate word for sparring |
 | 2026-09-23 | Weekly set targets count four groups: push, pull, squat, hinge | Matches the four main movement slots |
+| 2026-09-24 | Sign-in is one email-and-password account, created in the Supabase dashboard with sign-ups off; replaces emailed 6-digit codes | Chris wants to stay signed in with no links or codes. Simpler than codes, and unlike Baby Tracker's anonymous sign-in, a wiped phone or new phone gets the history back by signing in again |
+| 2026-09-24 | Supabase project settings: Data API on, automatic RLS on, new tables not exposed automatically | Migrations grant each table's actions on purpose, so log tables stay select and insert only at the permission level as well as in RLS |
 
 ## Plan
 

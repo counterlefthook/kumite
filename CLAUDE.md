@@ -22,7 +22,7 @@ These repo files are the source of truth. If SPEC and PLAN disagree, or a rule i
 ## Stack
 
 - Next.js with the App Router, TypeScript, and a `src/` directory; Tailwind CSS for styling
-- Supabase: Postgres, Auth with emailed 6-digit codes, row-level security; the schema lives as migrations in `supabase/migrations/`
+- Supabase: Postgres, Auth with one email-and-password account (created in the dashboard, sign-ups off, no emailed links or codes), row-level security; the schema lives as migrations in `supabase/migrations/`
 - Vercel for hosting: every branch gets a preview URL, and `main` is production
 - Vitest for unit tests
 - Installable web app (PWA) through a web app manifest
