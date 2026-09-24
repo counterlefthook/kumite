@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "about": "Seed data for the Kumite exercises table. Each ladder lists exercises from easiest to hardest by rung. The engine moves up a ladder when load and reps are maxed out (see PLAN.md, Engine rules).",
   "units": {
     "load": "pounds per dumbbell",
@@ -839,7 +839,9 @@
       "reps": null,
       "seconds": null,
       "knee": "low",
-      "cue": "Hands on the floor or a sturdy desk edge. Stop well short of failure."
+      "cue": "Hands on the floor or a sturdy desk edge. Stop well short of failure.",
+      "desk_slot": "push",
+      "desk_factor": 1
     },
     {
       "id": "chair_squat",
@@ -859,7 +861,9 @@
       "reps": null,
       "seconds": null,
       "knee": "moderate",
-      "cue": "Sit back until you touch the chair, stand without using your hands."
+      "cue": "Sit back until you touch the chair, stand without using your hands.",
+      "desk_slot": "legs",
+      "desk_factor": 1
     },
     {
       "id": "pullup_single",
@@ -879,7 +883,9 @@
       "reps": null,
       "seconds": null,
       "knee": "low",
-      "cue": "One or two clean reps, then walk away."
+      "cue": "One or two clean reps, then walk away.",
+      "desk_slot": "pull",
+      "desk_factor": 1
     },
     {
       "id": "glute_bridge",
@@ -897,7 +903,9 @@
       "reps": null,
       "seconds": null,
       "knee": "low",
-      "cue": "On your back with feet flat, drive the hips up and squeeze. Replaces chair squats on sore-knee days."
+      "cue": "On your back with feet flat, drive the hips up and squeeze. Replaces chair squats on sore-knee days.",
+      "desk_slot": "legs",
+      "desk_factor": 1
     },
     {
       "id": "calf_raise",
@@ -915,7 +923,9 @@
       "reps": null,
       "seconds": null,
       "knee": "low",
-      "cue": "Rise onto the balls of the feet, pause, lower slowly."
+      "cue": "Rise onto the balls of the feet, pause, lower slowly.",
+      "desk_slot": "legs",
+      "desk_factor": 1.5
     },
     {
       "id": "wall_sit",
@@ -937,6 +947,170 @@
       ],
       "knee": "moderate",
       "cue": "Back flat on the wall, knees at a comfortable angle, hold."
+    },
+    {
+      "id": "desk_wide_pushup",
+      "name": "Wide push-up",
+      "ladder": "desk",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "rung": 7,
+      "group": "push",
+      "equipment": [],
+      "knee": "low",
+      "cue": "Hands wider than your shoulders. Chest to the floor, elbows out a little.",
+      "desk_slot": "push",
+      "desk_factor": 1
+    },
+    {
+      "id": "desk_close_pushup",
+      "name": "Close-hands push-up",
+      "ladder": "desk",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "rung": 8,
+      "group": "push",
+      "equipment": [],
+      "knee": "low",
+      "cue": "Hands under your chest, thumbs nearly touching. Elbows brush your ribs.",
+      "desk_slot": "push",
+      "desk_factor": 0.6
+    },
+    {
+      "id": "desk_wall_pushup",
+      "name": "Wall push-up",
+      "ladder": "desk",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "rung": 9,
+      "group": "push",
+      "equipment": [],
+      "knee": "low",
+      "cue": "Hands on the wall at shoulder height, body straight. Easy reps, full range.",
+      "desk_slot": "push",
+      "desk_factor": 2
+    },
+    {
+      "id": "desk_incline_pushup",
+      "name": "Incline push-up",
+      "ladder": "desk",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "rung": 10,
+      "group": "push",
+      "equipment": [
+        "desk"
+      ],
+      "knee": "low",
+      "cue": "Hands on a sturdy desk edge, body in a straight line. Chest to the edge.",
+      "desk_slot": "push",
+      "desk_factor": 1.5
+    },
+    {
+      "id": "desk_decline_pushup",
+      "name": "Decline push-up",
+      "ladder": "desk",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "rung": 11,
+      "group": "push",
+      "equipment": [
+        "chair"
+      ],
+      "knee": "low",
+      "cue": "Feet on the chair seat, hands on the floor. Keep the hips from sagging.",
+      "desk_slot": "push",
+      "desk_factor": 0.7
+    },
+    {
+      "id": "desk_lunge",
+      "name": "Lunge",
+      "ladder": "desk",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "rung": 12,
+      "group": "squat",
+      "equipment": [],
+      "knee": "moderate",
+      "cue": "Step forward, back knee toward the floor, push back up. Alternate legs; count every rep.",
+      "desk_slot": "legs",
+      "desk_factor": 0.8
+    },
+    {
+      "id": "desk_reverse_lunge",
+      "name": "Reverse lunge",
+      "ladder": "desk",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "rung": 13,
+      "group": "squat",
+      "equipment": [],
+      "knee": "moderate",
+      "cue": "Step back, back knee toward the floor, return. Alternate legs; count every rep.",
+      "desk_slot": "legs",
+      "desk_factor": 0.8
+    },
+    {
+      "id": "desk_split_squat",
+      "name": "Split squat",
+      "ladder": "desk",
+      "load": "bodyweight",
+      "dumbbells": 0,
+      "context": [
+        "desk"
+      ],
+      "unilateral": false,
+      "reps": null,
+      "seconds": null,
+      "rung": 14,
+      "group": "squat",
+      "equipment": [],
+      "knee": "moderate",
+      "cue": "Staggered stance, drop straight down and up. Half the reps on each leg.",
+      "desk_slot": "legs",
+      "desk_factor": 0.6
     }
   ]
 }

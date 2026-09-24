@@ -29,4 +29,4 @@ export function rangeLabel(reps: readonly [number, number] | null, seconds: read
   return "";
 }
 
-export const DESK_NAMES = { pushups: "Push-ups", squats: "Chair squats", pullups: "Pull-up singles" } as const;
+export const DESK_NAMES = { pushups: "Push", squats: "Legs", pullups: "Pull-ups" } as const;

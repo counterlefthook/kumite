@@ -40,7 +40,10 @@ export const CALM: CheckIn = { sorenessLegs: 2, sorenessUpper: 2, energy: 4, kne
 
 /** A Chicago wall-clock time as a Date, e.g. at("2026-09-28", "18:00"). */
 export function at(date: string, time = "18:00"): Date {
-  return new Date(new TZDate(`${date}T${time}:00`, ZONE).getTime());
+  const [y, m, d] = date.split("-").map(Number);
+  const [h, min] = time.split(":").map(Number);
+  // Built from its parts so the wall-clock time is read in Chicago, not UTC.
+  return new Date(new TZDate(y, m - 1, d, h, min, 0, ZONE).getTime());
 }
 
 export interface SetSpec {

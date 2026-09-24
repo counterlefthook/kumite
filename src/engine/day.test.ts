@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { noGymPlan, pelotonMinutesThisWeek, planDay } from "./day";
+import { slotOf } from "./desk";
+import { exerciseById } from "./library";
 import { at, LIB, makeHistory, PROFILE, ZONE, type DeskSpec, type SessionSpec } from "./test-helpers";
 
 // Week of Monday 2026-10-05. Targets: 3 home workouts, 60 Peloton minutes.
@@ -77,7 +79,8 @@ describe("the home screen", () => {
       { slot: "pullups", done: 2, target: 5 },
     ]);
     expect(d).toMatchObject({ pelotonMinutes: 20, pelotonTarget: 60, homeWorkouts: 1, homeTarget: 3, flawless: false, fightDay: false });
-    expect(d.deskNow).toMatchObject({ kind: "desk_break", exerciseId: "chair_squat" });
+    expect(d.deskNow.kind).toBe("desk_break");
+    if (d.deskNow.kind === "desk_break") expect(slotOf(exerciseById(LIB, d.deskNow.exerciseId))).toBe("squats");
   });
 
   it.each([

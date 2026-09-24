@@ -55,7 +55,7 @@ async function publishableKey(ref) {
 
 const TABLES = [
   "profile", "equipment", "exercises", "sessions", "sets", "desk_sets", "body_metrics",
-  "sessions_current", "sets_current", "desk_sets_current", "body_metrics_current", "dev_notes",
+  "sessions_current", "sets_current", "desk_sets_current", "body_metrics_current", "dev_notes", "push_subscriptions",
 ];
 
 async function main() {

@@ -5,8 +5,8 @@ import { exerciseAt, lastRung, parseLibrary } from "./library";
 const copy = () => JSON.parse(JSON.stringify(rawLibrary));
 
 describe("exercise library", () => {
-  it("the real docs/exercise-library.json passes, with all 36 exercises", () => {
-    expect(parseLibrary(copy()).exercises).toHaveLength(36);
+  it("the real docs/exercise-library.json passes, with all 44 exercises", () => {
+    expect(parseLibrary(copy()).exercises).toHaveLength(44);
   });
 
   it("looks up rungs", () => {

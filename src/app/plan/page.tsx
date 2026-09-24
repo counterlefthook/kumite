@@ -36,7 +36,7 @@ export default async function Plan({ searchParams }: PageProps<"/plan">) {
         <Panel>
           <p className="m-0 text-[18px]">{plan.reason}</p>
         </Panel>
-        <BigLink href="/desk" tone="stone">DESK SETS</BigLink>
+        <BigLink href="/" tone="stone">DESK SETS</BigLink>
         <BackLink />
       </>
     );

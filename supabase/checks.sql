@@ -27,7 +27,8 @@ begin
   execute 'set local role anon';
   perform set_config('request.jwt.claims', '', true);
   foreach t in array array['profile', 'equipment', 'exercises', 'sessions', 'sets', 'desk_sets',
-    'body_metrics', 'sessions_current', 'sets_current', 'desk_sets_current', 'body_metrics_current', 'dev_notes'] loop
+    'body_metrics', 'sessions_current', 'sets_current', 'desk_sets_current', 'body_metrics_current', 'dev_notes',
+    'push_subscriptions'] loop
     begin
       execute format('select count(*) from public.%I', t) into n;
       raise exception 'CHECK FAILED: signed-out read of % was allowed', t;
@@ -41,12 +42,27 @@ begin
   perform set_config('request.jwt.claims', json_build_object('sub', u1, 'role', 'authenticated')::text, true);
 
   select count(*) into n from public.exercises;
-  if n <> 36 then raise exception 'CHECK FAILED: expected 36 exercises, found %', n; end if;
+  if n <> 44 then raise exception 'CHECK FAILED: expected 44 exercises, found %', n; end if;
 
   insert into public.profile (height_in, baseline_weight_lb) values (74, 205);
   update public.profile set baseline_weight_lb = 204;
   select count(*) into n from public.profile where peloton_minutes_week = 60 and home_workouts_week = 3;
   if n <> 1 then raise exception 'CHECK FAILED: weekly targets did not default to 60 minutes and 3 workouts'; end if;
+
+  -- Location: set it on your own profile; only desk, gym, or out.
+  update public.profile set location = 'desk', location_date = current_date;
+  begin
+    update public.profile set location = 'moon';
+    raise exception 'CHECK FAILED: a location other than desk, gym, or out was allowed';
+  exception when check_violation then null;
+  end;
+
+  -- Push subscriptions: add, read, and remove your own.
+  insert into public.push_subscriptions (endpoint, p256dh, auth) values ('https://push.example/abc', 'key', 'secret');
+  delete from public.push_subscriptions where endpoint = 'https://push.example/abc';
+  get diagnostics n = row_count;
+  if n <> 1 then raise exception 'CHECK FAILED: removing your own push subscription did not work'; end if;
+  insert into public.push_subscriptions (endpoint, p256dh, auth) values ('https://push.example/keep', 'key', 'secret');
 
   -- Ideas: add and read your own; no edits, and no marking your own note done.
   insert into public.dev_notes (body, screen, app_version) values ('Bigger DONE button', '/', '0.1.0');
@@ -131,7 +147,8 @@ begin
   execute 'set local role authenticated';
   perform set_config('request.jwt.claims', json_build_object('sub', u2, 'role', 'authenticated')::text, true);
 
-  foreach t in array array['profile', 'equipment', 'sessions', 'sets', 'sessions_current', 'sets_current', 'dev_notes'] loop
+  foreach t in array array['profile', 'equipment', 'sessions', 'sets', 'sessions_current', 'sets_current', 'dev_notes',
+    'push_subscriptions'] loop
     execute format('select count(*) from public.%I', t) into n;
     if n <> 0 then raise exception 'CHECK FAILED: user 2 can see % row(s) of user 1 in %', n, t; end if;
   end loop;

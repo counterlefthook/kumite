@@ -1,11 +1,10 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { localDate } from "@/engine/calendar";
 import { APP_VERSION, LIBRARY } from "@/lib/data";
-import { CALIBRATION, GYM_COOKIE, ZONE } from "@/lib/constants";
+import { CALIBRATION, ZONE } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 
 // Every write in the app goes through these server actions, as Chris, under
@@ -64,26 +63,28 @@ export async function logDesk(form: FormData) {
   const exerciseId = String(form.get("exercise_id") ?? "");
   const reps = int(form, "reps");
   if (!LIBRARY.exercises.some((e) => e.id === exerciseId && e.context.includes("desk")) || !reps || reps < 1) {
-    back("/desk", "Could not log that desk set.");
+    back("/", "Could not log that desk set.");
   }
   const supabase = await createClient();
   const { error } = await supabase.from("desk_sets").insert({ exercise_id: exerciseId, reps });
-  if (error) back("/desk", error.message);
+  if (error) back("/", error.message);
   revalidatePath("/");
-  redirect("/?done=desk");
+  redirect("/");
 }
 
-// ---------- gym today ----------
+// ---------- where Chris is today (Desk / Gym / Out) ----------
 
-export async function answerGym(form: FormData) {
-  const yes = form.get("answer") === "yes";
-  const store = await cookies();
-  if (yes) {
-    store.set(GYM_COOKIE, localDate(new Date(), ZONE), { maxAge: 60 * 60 * 36, path: "/", sameSite: "lax" });
-    redirect("/fight");
-  }
-  store.delete(GYM_COOKIE);
-  redirect("/plan");
+export async function setWhere(form: FormData) {
+  const where = String(form.get("where") ?? "");
+  if (where !== "desk" && where !== "gym" && where !== "out") back("/", "Pick desk, gym, or out.");
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profile")
+    .update({ location: where, location_date: localDate(new Date(), ZONE) })
+    .not("user_id", "is", null);
+  if (error) back("/", error.message);
+  revalidatePath("/");
+  redirect("/");
 }
 
 // ---------- other logs ----------
@@ -307,4 +308,25 @@ export async function logSet(form: FormData) {
   });
   if (error) back(path, error.message);
   revalidatePath(path);
+}
+
+// ---------- desk nudges ----------
+
+export async function saveSubscription(sub: {
+  endpoint?: string;
+  keys?: { p256dh?: string; auth?: string };
+}): Promise<{ ok: boolean; error?: string }> {
+  const endpoint = String(sub?.endpoint ?? "");
+  const p256dh = String(sub?.keys?.p256dh ?? "");
+  const auth = String(sub?.keys?.auth ?? "");
+  if (!endpoint.startsWith("https://") || !p256dh || !auth) return { ok: false, error: "That subscription looks incomplete." };
+  const supabase = await createClient();
+  await supabase.from("push_subscriptions").delete().eq("endpoint", endpoint);
+  const { error } = await supabase.from("push_subscriptions").insert({ endpoint, p256dh, auth });
+  return error ? { ok: false, error: error.message } : { ok: true };
+}
+
+export async function removeSubscription(endpoint: string): Promise<void> {
+  const supabase = await createClient();
+  await supabase.from("push_subscriptions").delete().eq("endpoint", endpoint);
 }

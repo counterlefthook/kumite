@@ -6,6 +6,7 @@ import { ZONE } from "@/lib/constants";
 import { APP_VERSION, loadAll } from "@/lib/data";
 import { BackLink, ErrorNote, Title } from "@/components/ui";
 import { SetupForm } from "@/components/setup-form";
+import { NudgeToggle } from "@/components/nudge-toggle";
 
 export default async function Settings({ searchParams }: PageProps<"/settings">) {
   const data = await loadAll();
@@ -16,6 +17,7 @@ export default async function Settings({ searchParams }: PageProps<"/settings">)
       <Title sub="SETTINGS" />
       <ErrorNote message={typeof error === "string" ? error : null} />
       <SetupForm from="/settings" profile={data.profileRow} equipment={data.equipmentRow} today={localDate(new Date(), ZONE)} />
+      <NudgeToggle />
       <Link href="/onboarding/calibrate" className="flex min-h-[52px] items-center justify-center border-2 border-gold-700 text-[17px] font-bold text-gold-300">
         Recalibrate starting weights
       </Link>

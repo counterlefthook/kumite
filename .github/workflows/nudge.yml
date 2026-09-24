@@ -1,0 +1,28 @@
+# Knocks on Kumite's nudge address every hour on weekdays. Kumite decides
+# whether to send a desk nudge (work hours, behind pace, not a fight day).
+# Needs the repository secret CRON_SECRET, the same value as in Vercel.
+name: Desk nudge
+
+on:
+  schedule:
+    # 13:05 to 23:05 UTC covers 8 am to 6 pm in Chicago in summer and winter time.
+    - cron: "5 13-23 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      test:
+        description: "Send a test nudge regardless of the rules"
+        type: boolean
+        default: false
+
+jobs:
+  nudge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Call Kumite
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          TEST: ${{ inputs.test && '1' || '0' }}
+        run: |
+          curl -fsS -X POST "https://kumite-counterlefthooks-projects.vercel.app/api/nudge?test=${TEST}" \
+            -H "Authorization: Bearer ${CRON_SECRET}"

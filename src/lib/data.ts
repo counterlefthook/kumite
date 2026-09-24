@@ -11,6 +11,7 @@ import type {
   TemplateId,
 } from "@/engine/types";
 import type { Database, Json } from "@/lib/database.types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 
 // Loads Chris's settings and logs from Supabase and turns them into the shapes
@@ -59,6 +60,14 @@ export function toProfile(row: ProfileRow): Profile {
   };
 }
 
+export type Where = "desk" | "gym" | "out";
+
+/** Today's location from the Desk / Gym / Out switch; an answer from an earlier day counts as unset. */
+export function whereToday(row: ProfileRow | null, today: string): Where | null {
+  if (!row?.location || row.location_date !== today) return null;
+  return row.location === "desk" || row.location === "gym" || row.location === "out" ? row.location : null;
+}
+
 export function bandsOf(row: EquipmentRow | null): Band[] {
   return Array.isArray(row?.bands) ? (row.bands as unknown as Band[]).filter((b) => b && typeof b.name === "string") : [];
 }
@@ -86,14 +95,22 @@ export async function loadAll(): Promise<Loaded | null> {
   const { data: claims } = await supabase.auth.getClaims();
   const userId = claims?.claims?.sub;
   if (!userId) return null;
+  return loadWith(supabase, userId);
+}
 
+/**
+ * Loads one user's data with any Supabase client. The app passes the signed-in
+ * client; the hourly nudge job passes the server-only admin client, which skips
+ * row-level security, so every query also filters by user_id.
+ */
+export async function loadWith(supabase: SupabaseClient<Database>, userId: string): Promise<Loaded> {
   const [profile, equipment, sessions, sets, desk, metrics] = await Promise.all([
-    supabase.from("profile").select("*").maybeSingle(),
-    supabase.from("equipment").select("*").maybeSingle(),
-    supabase.from("sessions_current").select("*").order("started_at"),
-    supabase.from("sets_current").select("*"),
-    supabase.from("desk_sets_current").select("*"),
-    supabase.from("body_metrics_current").select("*"),
+    supabase.from("profile").select("*").eq("user_id", userId).maybeSingle(),
+    supabase.from("equipment").select("*").eq("user_id", userId).maybeSingle(),
+    supabase.from("sessions_current").select("*").eq("user_id", userId).order("started_at"),
+    supabase.from("sets_current").select("*").eq("user_id", userId),
+    supabase.from("desk_sets_current").select("*").eq("user_id", userId),
+    supabase.from("body_metrics_current").select("*").eq("user_id", userId),
   ]);
   for (const r of [profile, equipment, sessions, sets, desk, metrics]) {
     if (r.error) throw new Error(r.error.message);

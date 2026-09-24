@@ -42,6 +42,11 @@ export function parseLibrary(raw: unknown): Library {
       if ((e.load === "hold") !== (e.seconds !== null)) fail(`${e.id}: holds use seconds, everything else reps`);
     }
     if (typeof e.cue !== "string" || !e.name) fail(`${e.id} is missing a name or cue`);
+    if (e.desk_slot !== undefined) {
+      if (!["push", "legs", "pull"].includes(e.desk_slot)) fail(`${e.id} has unknown desk slot ${e.desk_slot}`);
+      if (!e.context.includes("desk")) fail(`${e.id} has a desk slot but is not a desk move`);
+      if (!(typeof e.desk_factor === "number" && e.desk_factor > 0)) fail(`${e.id} needs a desk factor above 0`);
+    }
   }
 
   // Rungs on each ladder run 1, 2, 3... with no gaps.

@@ -133,6 +133,30 @@ Modeled on Baby Tracker's dev notes.
 - [ ] Chris installs the production app, runs onboarding, and completes calibration.
 - Done when: Chris logs his first real session on production.
 
+## Version 0.1.1: Chris's first ideas (branch `feat/ideas-1`)
+
+From the two open notes in `dev_notes` on 2026-09-25, decided with Chris that day.
+
+### Task 3.1: Rotating desk moves
+
+- [x] New desk moves in `docs/exercise-library.json` (wide, close-hands, wall, incline, and decline push-ups; lunges, reverse lunges, and split squats), each with `desk_slot` (push, legs, or pull) and `desk_factor`; seed regenerated as a migration.
+- [x] Every move counts toward its goal; moves rotate as in "Desk sets" below.
+- Done when: the desk card shows different moves through the day and every rep fills the right bar.
+
+### Task 3.2: Desk / Gym / Out switch
+
+- [x] Migration: `profile.location` and `profile.location_date`.
+- [x] The switch at the top of home, saved on the profile, resetting each morning. Desk shows the move to do now with DONE on the home screen; Gym shows the fight day and the class log; Out shows the no-gym plan.
+- Done when: choosing Desk once keeps the desk card up until the switch changes, and it resets the next morning.
+
+### Task 3.3: Desk nudges by push notification
+
+- [x] Migration: `push_subscriptions`, with row-level security (add, read, and remove your own).
+- [x] A service worker (`public/sw.js`), "Turn on nudges" in Settings, and `/api/nudge`, which needs `CRON_SECRET` and uses the server-only `SUPABASE_SECRET_KEY`.
+- [x] `deskNudge()` in `src/engine/nudge.ts` following "Desk nudges" below, with tests.
+- [x] `.github/workflows/nudge.yml` calls `/api/nudge` hourly on weekdays; `?test=1` sends a test nudge.
+- Done when: a test nudge arrives on Chris's phone, and a real one arrives during work hours while he is behind.
+
 ## Stage 3: Live with it
 
 Use Kumite for one to two weeks before starting food tracking (0.2). Real use will expose what the spec missed, and fixes are cheaper before the food layer sits on top. Capture every bug and gap in the Parking lot, then plan 0.2 with the same spec, decisions, and tasks process.
@@ -151,6 +175,9 @@ Config tables are editable. Log tables are append-only: corrections are new rows
 | `desk_sets` | Log | `id`, `user_id`, `exercise_id`, `reps`, `seconds` (wall sits), `logged_at`, `supersedes`, `voided`, `created_at` |
 | `body_metrics` | Log | `id`, `user_id`, `kind` (`weight_lb` or `waist_in`), `value`, `measured_at`, `supersedes`, `voided`, `created_at` |
 | `dev_notes` | Feedback (Task 2.5) | `id`, `user_id`, `body`, `screen`, `app_version`, `status` (`open`, `planned`, `done`), `addressed_in`, `created_at` |
+| `push_subscriptions` | Config (Task 3.3) | `id`, `user_id`, `endpoint` (unique), `p256dh`, `auth`, `created_at`. Select, insert, and delete on your own rows. |
+
+`profile` also has `location` (`desk`, `gym`, or `out`) and `location_date` for the Desk / Gym / Out switch (Task 3.2).
 
 Policies: config tables allow select, insert, and update on the user's own row. `exercises` allows select for signed-in users. Log tables allow select and insert only.
 
@@ -163,9 +190,10 @@ These are the precise, testable versions of the rules in `docs/SPEC.md`.
 Version 0.1 has no check-in (decided 2026-09-24). The rules that need one stay in the engine but are switched off: the recovery check, the leg cap, and the knee swap at check-in. The knee flag on a logged set still applies. Without check-ins, recovery never counts as holding, so weeks 5 onward use 9 hard sets and 3 rounds.
 
 - Home screen: today's desk goals on workdays (Desk sets below), Peloton minutes this week against the weekly target (default 60), and home workouts (strength sessions) this week against the weekly target (default 3).
-- "At your desk?": the desk break rule in step 4 below.
-- "Gym today?", yes: a fight day. Nothing else is suggested. The class logs afterward as a `fight` session. Desk sets can still be logged, but that day's desk goals are excused: the nudge ignores them and the streak skips the day.
-- "Gym today?", no: compare the share done this week, home workouts ÷ target and Peloton minutes ÷ target. The lower share wins; a tie goes to the home workout. A home workout is not offered the day after one (step 2 below) unless the quota squeeze applies (step 6); then the Peloton is offered if it is short, else a rest day. With both targets met, it is a rest day with desk sets optional.
+- The Desk / Gym / Out switch (decided 2026-09-25) replaces the two questions. Its answer counts only on the date it was set.
+- Desk: the desk break rule in step 4 below, shown on the home screen with DONE.
+- Gym: a fight day. Nothing else is suggested. The class logs afterward as a `fight` session. Desk sets can still be logged, but that day's desk goals are excused: the nudge ignores them and the streak skips the day.
+- Out: compare the share done this week, home workouts ÷ target and Peloton minutes ÷ target. The lower share wins; a tie goes to the home workout. A home workout is not offered the day after one (step 2 below) unless the quota squeeze applies (step 6); then the Peloton is offered if it is short, else a rest day. With both targets met, it is a rest day with desk sets optional.
 - The home workout is the 30-minute box (step 4), or the 20-minute box on a squeeze day. There is no time picker in 0.1.
 - Nudge: while Peloton minutes are short, "You still need N minutes on the Peloton this week: a class or a ride." When desk sets were logged today, it starts "You've done some desk sets, but".
 - Fight days are known from a `fight` session logged that day, or from "Gym today?" answered yes.
@@ -244,6 +272,14 @@ Evaluated from the most recent session that included the exercise. The current s
 - Daily targets: push-ups 100 a day; chair squats 25 per work hour (200 across a 9:00 to 17:00 workday); pull-up singles 5 a day. All editable in Settings.
 - Mini-set size: half the latest max for that exercise, rounded down, minimum 1. Maxes come from calibration, a push-up retest every 4 weeks, and pull-up max tests. Pull-up singles are always 1 rep.
 - Knee pain above 3 at the day's check-in swaps chair squats for glute bridges that day. Glute bridges are sized from the chair squat max and count toward the squat target.
+- Rotation (decided 2026-09-25): the three goals are push, legs, and pull. Every desk move with a `desk_slot` counts toward that goal. The desk break first picks the goal furthest behind (as above), then the move in it done least recently today, never the move just done when another exists; moves not yet done today come first, ordered by a stable hash of the date and move id so each day starts differently. Wall sits have no slot and stay out of the rotation.
+- Move size: the goal's base mini-set (half the push-up max for push, half the chair squat max for legs) times the move's `desk_factor`, rounded down, minimum 1. Pull-up singles are always 1.
+
+### Desk nudges
+
+- Sent only on a workday, inside work hours, when the day is not a fight day (a `fight` session today, or the switch on Gym), not every desk goal is met, and at least one goal is behind pace (done below its daily target times the share of the workday gone).
+- The message is "ROUND n: reps x Move." with the desk break's reason, where n counts today's desk sets plus one. Tapping it opens the home screen.
+- At most once an hour, because the job runs hourly. Phones whose subscription has expired are removed when a send fails with 404 or 410.
 - Workdays are Monday to Friday. Weekends show totals without targets.
 
 ### Derived metrics
@@ -278,4 +314,5 @@ Ideas and gaps captured during the build go here instead of into the current tas
 
 - Week view (moved out of 0.1 on 2026-09-24): hard sets per group against the week's target with a pace marker, fight sessions, and pull-up progress against the 5, 8, and 10 milestones. The home screen covers the week's goals for now.
 - Time picker (10 or 20-minute workouts on busy days) and the check-in rules: both still in the engine, switched off in 0.1.
+- Game layer (from Chris's idea note, 2026-09-25): XP for every rep and set with belt ranks; combos and announcer moments (COMBO, EXCELLENT, ROUND WON) with a phone buzz; badges for milestones and a weekly boss fight for hitting every weekly goal.
 

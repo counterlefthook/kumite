@@ -4,7 +4,8 @@ import { NextResponse, type NextRequest } from "next/server";
 // Runs before every page: refreshes the Supabase session cookie and sends
 // anyone who is not signed in to /signin. The sign-in page, the manifest, and
 // the icons stay public so the home-screen install works.
-const PUBLIC = ["/signin", "/manifest.webmanifest", "/icon", "/apple-icon", "/icons"];
+// /api/nudge checks its own secret; sw.js must load before sign-in state is known.
+const PUBLIC = ["/signin", "/manifest.webmanifest", "/icon", "/apple-icon", "/icons", "/sw.js", "/api/nudge"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });

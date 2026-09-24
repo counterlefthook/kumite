@@ -105,14 +105,15 @@ Easy singles on the doorway bar through the workday add practice without much fa
 
 ## Suggestion engine
 
-The app asks as little as possible. The home screen shows today's desk goals as health bars, this week's Peloton minutes and home workouts, and a nudge about whatever is behind. Two questions do the rest. Fixed rules, no model.
+The app asks as little as possible. The home screen shows today's desk goals as health bars, this week's Peloton minutes and home workouts, and a nudge about whatever is behind. A Desk / Gym / Out switch at the top does the rest; it stays on Chris's choice until he changes it and resets each morning. Fixed rules, no model.
 
-1. "At your desk?": one thing to do now, the desk exercise furthest behind its daily goal, sized as a mini-set. One tap logs it. Filling every desk goal for the day shows FLAWLESS.
-2. "Gym today?" (the kickboxing or MMA gym): yes means that is the day's training. Nothing else is suggested, the class is logged afterward, and desk sets stay available but that day's desk goals do not count against the nudge or the streak.
-3. No gym: the app suggests whatever is furthest behind this week, comparing home workouts (3) with Peloton minutes (60) as a share of each target. A home workout comes with "OK, here's what we're going to do" and the exercises; a Peloton suggestion names the minutes still needed. With both done, it is a rest day, with desk sets if wanted.
+1. Desk: the home screen shows one thing to do now, with DONE right there, and the next move appears after each one. The three daily goals are push, legs, and pull; each has several moves (push-up variations, lunges, squats, calf raises, bridges, pull-up singles), and the app rotates them so it mixes it up. Every rep counts toward its goal. Filling every desk goal for the day shows FLAWLESS.
+2. Gym (the kickboxing or MMA gym): that is the day's training. Nothing else is suggested, the class is logged afterward, and desk sets stay available but that day's desk goals do not count against the nudge or the streak.
+3. Out: the app suggests whatever is furthest behind this week, comparing home workouts (3) with Peloton minutes (60) as a share of each target. A home workout comes with "OK, here's what we're going to do" and the exercises; a Peloton suggestion names the minutes still needed. With both done, it is a rest day, with desk sets if wanted.
 4. Nudge: whenever Peloton minutes are short for the week, the home screen says so, for example "You've done some desk sets, but you still need 50 minutes on the Peloton this week: a class or a ride."
 5. The home workout: the A and B templates at the current progression step, 30 minutes (both pairs and the finisher), with each exercise's weight, reps, and sets. A knee flag on a squat set still swaps the rest of that exercise and drops it one rung next time.
-6. No check-in in 0.1. The soreness, energy, knee, and fight-tomorrow rules stay in the engine but are switched off.
+6. Desk nudges by push notification: at most once an hour during work hours on workdays, only while a desk goal is behind pace, silent on fight days. Each names the next move, for example "ROUND 3: 12 x Wide push-up."
+7. No check-in in 0.1. The soreness, energy, knee, and fight-tomorrow rules stay in the engine but are switched off.
 
 Calendar-aware slot suggestions come later (see Plan).
 
@@ -200,7 +201,7 @@ Same stack and pattern as Baby Tracker: Next.js on Vercel, Supabase, a GitHub re
 
 ## Decisions
 
-Thirty-seven decisions so far; new ones get appended with their date.
+Forty-one decisions so far; new ones get appended with their date.
 
 | Date | Decision | Why |
 | --- | --- | --- |
@@ -241,6 +242,10 @@ Thirty-seven decisions so far; new ones get appended with their date.
 | 2026-09-24 | No check-in in 0.1: the recovery, leg-cap, and knee check-in rules are switched off; the knee flag on a set stays | Chris wants no questions up front; the rules stay in the engine for later |
 | 2026-09-24 | Look: an original fighting-game style in the spirit of early-1990s arcade fighters (dark stone, blood red, fire, gold) replaces red, white, and blue | Chris's pick after the second mockup; no game or film logos, names, characters, or fonts |
 | 2026-09-24 | Task order: the look comes first, the idea button becomes a task, and the week view moves to the Parking lot | Chris wants to see Kumite early; the home screen now shows the week |
+| 2026-09-25 | Desk goals stay push, legs, and pull, with several rotating moves in each; every rep counts toward its goal | Chris's first idea note: "it needs to mix it up" |
+| 2026-09-25 | A Desk / Gym / Out switch on the home screen replaces the "At your desk?" and "Gym today?" buttons; it is saved on the profile and resets each morning | Chris's first idea note: no re-tapping "At your desk"; the nudge job needs to see gym days |
+| 2026-09-25 | Desk nudges by push notification, at most hourly while behind pace in work hours, silent on fight days and weekends; a GitHub Action calls the app every hour | Chris's second idea note; Vercel's free plan allows only daily scheduled jobs |
+| 2026-09-25 | XP and ranks, combos and announcer moments, and badges and boss fights wait in the Parking lot | Chris picked push notifications first |
 
 ## Plan
 
@@ -249,9 +254,10 @@ Version 0.1 ships the workout core, food arrives in 0.2, and photo estimation st
 | Version | Scope |
 | --- | --- |
 | 0.1 | Onboarding and calibration, a home screen with desk goals and the "At your desk?" and "Gym today?" questions, the home workout with set logging and progression, Peloton and fight-class logging, an idea button |
+| 0.1.1 | Chris's first ideas: rotating desk moves, the Desk / Gym / Out switch, and desk nudges by push notification |
 | 0.2 | Manual food entry with the parse and lookup layer (food library and USDA), protein and calorie targets, daily totals |
 | 0.3 | Dashboard: 7-day weight, waist, estimated 1-rep max charts; a lighter deload week every 6 to 8 weeks |
-| 0.4 | FatSecret and Open Food Facts, barcode scanning, hourly desk-set nudges by web push |
+| 0.4 | FatSecret and Open Food Facts, barcode scanning |
 | 0.5 | Calendar-aware slot suggestions from Google Calendar, including fight sessions, a weekly summary written by a model from the data |
 | Later | Photo-based calorie estimation |
 

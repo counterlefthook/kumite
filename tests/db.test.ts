@@ -36,9 +36,9 @@ beforeAll(async () => {
 }, 60_000);
 
 describe("database schema", () => {
-  it("seeds all 36 exercises from the library", async () => {
+  it("seeds all 44 exercises from the library", async () => {
     const { rows } = await db.query<{ n: number }>("select count(*)::int as n from public.exercises");
-    expect(rows[0].n).toBe(36);
+    expect(rows[0].n).toBe(44);
   });
 
   it("passes every permission, row-level security, view, and limit check", async () => {

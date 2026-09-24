@@ -269,6 +269,8 @@ export type Database = {
           desk_targets: Json
           height_in: number
           home_workouts_week: number
+          location: string | null
+          location_date: string | null
           peloton_minutes_week: number
           program_start_date: string
           protein_target_g: number
@@ -284,6 +286,8 @@ export type Database = {
           desk_targets?: Json
           height_in: number
           home_workouts_week?: number
+          location?: string | null
+          location_date?: string | null
           peloton_minutes_week?: number
           program_start_date?: string
           protein_target_g?: number
@@ -299,6 +303,8 @@ export type Database = {
           desk_targets?: Json
           height_in?: number
           home_workouts_week?: number
+          location?: string | null
+          location_date?: string | null
           peloton_minutes_week?: number
           program_start_date?: string
           protein_target_g?: number
@@ -307,6 +313,33 @@ export type Database = {
           user_id?: string
           work_end?: string
           work_start?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_id?: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_id?: string
         }
         Relationships: []
       }

@@ -31,6 +31,10 @@ export interface Exercise {
   seconds: Range | null;
   knee: "low" | "moderate" | "high";
   cue: string;
+  /** Desk moves only: the daily goal the reps count toward. */
+  desk_slot?: "push" | "legs" | "pull";
+  /** Desk moves only: mini-set size relative to the slot's base move. */
+  desk_factor?: number;
 }
 
 export interface Ladder {
