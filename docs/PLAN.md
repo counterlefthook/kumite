@@ -149,10 +149,11 @@ Same working rules as Stage 2: one task per branch, plan-mode review first, then
 
 ### Task 4.2: Nudge engine (branch `feat/nudge-engine`)
 
-- [ ] `src/engine/nudge.ts`: `pickNudge({ now, profile, history, lastNudge })` returning `null` or `{ kind, text, action, exerciseId?, reps?, url? }`, following the Reminders section of the spec and the Nudge rules below. Pure, like the rest of the engine.
-- [ ] Reuse `desk.ts` for the furthest-behind desk exercise and `day.ts` for fight, strength, and rest classification.
-- [ ] Migration `nudges_and_push`: `push_subscriptions` (`id`, `user_id`, `endpoint` unique, `p256dh`, `auth`, `user_agent`, `created_at`) and `nudge_log` (`id`, `user_id`, `kind`, `text`, `channel`, `sent_at`, `acted_at`), both with row-level security. `nudge_log` is append-only.
-- [ ] Table-driven tests for every rule in Nudge rules.
+- [x] `src/engine/nudge.ts`: `pickNudge({ now, library, profile, history, lastNudgeAt, fightDay?, classPick? })` returning `null` or `{ kind, text, action, exerciseId?, reps?, url? }`, following the Reminders section of the spec and the Nudge rules below. Pure, like the rest of the engine.
+- [x] Reuse `desk.ts` for the furthest-behind desk exercise (a new `deskRanking()` factored out of `deskBreak()`) and `day.ts` for fight, strength, and rest classification.
+- [x] Migration `nudges_and_push`: `push_subscriptions` (`id`, `user_id`, `endpoint` unique per user, `p256dh`, `auth`, `user_agent`, `created_at`) and `nudge_log` (`id`, `user_id`, `kind`, `text`, `channel`, `sent_at`), both with row-level security. `nudge_log` is append-only and written only by the server; "acted on" is derived from `desk_sets` later rather than stored (an `acted_at` column would need an update, which log tables never allow).
+- [x] Table-driven tests for every rule in Nudge rules.
+- [x] Fixed `at()` in `test-helpers.ts` to build dates from components: the old string form was read in the machine's time zone, so the suite only passed on a Central-time PC.
 - Done when: tests pass and the lint rule still confirms the engine imports nothing from React, Next, or Supabase.
 
 ### Task 4.3: Web push (branch `feat/push`)
@@ -233,7 +234,9 @@ Version 0.2 note (2026-09-25): the knee-swap rules, the recovery check, and the 
 
 - Local time is America/Chicago from `profile.timezone`. Weekday means Monday to Friday.
 - 07:00 daily: morning plan. Text is the day's one thing from `planDay()` plus the class pick when it is a strength day.
-- Hourly at :00 from 08:00 to 16:00 on weekdays: a desk nudge for the desk exercise furthest behind pace (the `desk.ts` rule), sized as a mini-set. Skipped when all desk targets are met, when a `fight` or `strength` session was logged in the last 60 minutes, or when a nudge of any kind was sent in the last 45 minutes. If a `desk_sets` row was logged in the last 20 minutes, pick the next exercise in the ranking instead.
+- Hourly at :00 from 08:00 to 16:00 on weekdays: a desk nudge for the desk exercise furthest behind pace (the `desk.ts` rule), sized as a mini-set. Skipped when all desk targets are met, when a `fight` or `strength` session started in the last 60 minutes, or when a nudge of any kind was sent in the last 45 minutes. An exercise logged as a desk set in the last 20 minutes is not asked for again; the next in the ranking is.
+- Mini-set size: half the latest logged max (a `max_test` or calibration set), or 15 push-ups, 20 squats, and 1 pull-up single before any max exists. Never more than what is left of the day's target.
+- Due window: each scheduled minute counts as due for 15 minutes, so a job that runs a few minutes late still fires.
 - On a fight day, desk targets are halved before pace is computed.
 - 18:30 daily: evening catch-up, only when the day is a strength day by `planDay()` and no `strength` session is logged today. Text names the shortest class pick (10 minutes) with its link.
 - Sunday 19:00: recap (email only; the nudge function returns `kind = "recap"` and the route builds the email).

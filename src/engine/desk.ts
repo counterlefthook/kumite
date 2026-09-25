@@ -66,6 +66,26 @@ export function deskTargetsMet(lib: Library, profile: Profile, history: History,
 }
 
 /**
+ * Desk slots ranked furthest behind first, by shortfall against where each
+ * target should be by now as a share of the daily target. Before work starts
+ * and on weekends, by the smallest share done. Ties keep DESK_ORDER.
+ */
+export function deskRanking(lib: Library, profile: Profile, history: History, now: Date): DeskSlot[] {
+  const zone = profile.timezone;
+  const date = localDate(now, zone);
+  const targets = weekdayTargets(profile);
+  const done = deskDone(lib, history, date, zone);
+  const start = clockToMinutes(profile.workStart);
+  const end = clockToMinutes(profile.workEnd);
+  const share = isWorkday(date) ? Math.min(1, Math.max(0, (localMinutes(now, zone) - start) / (end - start))) : 0;
+  const score = (slot: DeskSlot) => (targets[slot] * share - done[slot]) / targets[slot];
+  return [...DESK_ORDER].sort((a, b) => {
+    const diff = score(b) - score(a);
+    return Math.abs(diff) < 1e-9 ? DESK_ORDER.indexOf(a) - DESK_ORDER.indexOf(b) : diff;
+  });
+}
+
+/**
  * The desk break: the one exercise furthest behind where it should be by now,
  * as a share of its daily target. Before work starts and on weekends, the one
  * with the smallest share done.
@@ -75,12 +95,8 @@ export function deskBreak(lib: Library, profile: Profile, history: History, now:
   const date = localDate(now, zone);
   const targets = weekdayTargets(profile);
   const done = deskDone(lib, history, date, zone);
-  const start = clockToMinutes(profile.workStart);
-  const end = clockToMinutes(profile.workEnd);
-  const share = isWorkday(date) ? Math.min(1, Math.max(0, (localMinutes(now, zone) - start) / (end - start))) : 0;
 
-  const score = (slot: DeskSlot) => (targets[slot] * share - done[slot]) / targets[slot];
-  const slot = DESK_ORDER.reduce((best, s) => (score(s) > score(best) + 1e-9 ? s : best));
+  const slot = deskRanking(lib, profile, history, now)[0];
 
   const exerciseId = slot === "pushups" ? DESK_PUSHUP : slot === "pullups" ? PULLUP_SINGLE : squatExercise(lib, kneePain);
   const reps =

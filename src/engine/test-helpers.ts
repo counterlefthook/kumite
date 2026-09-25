@@ -38,9 +38,16 @@ export const PROFILE: Profile = {
 
 export const CALM: CheckIn = { sorenessLegs: 2, sorenessUpper: 2, energy: 4, kneePain: 0, fightNext24h: false };
 
-/** A Chicago wall-clock time as a Date, e.g. at("2026-09-28", "18:00"). */
+/**
+ * A Chicago wall-clock time as a Date, e.g. at("2026-09-28", "18:00").
+ * Built from components, which TZDate reads in ZONE. A string without an
+ * offset would be read in the machine's own time zone, so the tests would
+ * pass on a Central-time PC and fail on a UTC build server.
+ */
 export function at(date: string, time = "18:00"): Date {
-  return new Date(new TZDate(`${date}T${time}:00`, ZONE).getTime());
+  const [y, mo, d] = date.split("-").map(Number);
+  const [h, mi] = time.split(":").map(Number);
+  return new Date(new TZDate(y, mo - 1, d, h, mi, 0, ZONE).getTime());
 }
 
 export interface SetSpec {
