@@ -130,12 +130,83 @@ Modeled on Baby Tracker's dev notes.
 ### Task 2.11: Release 0.1
 
 - [x] Merge to `main`, tag `v0.1.0`, and confirm the production deploy.
-- [ ] Chris installs the production app, runs onboarding, and completes calibration.
-- Done when: Chris logs his first real session on production.
+- [ ] ~~Chris installs the production app, runs onboarding, and completes calibration.~~ Not done; superseded by Stage 4.
+- Done when: superseded.
 
-## Stage 3: Live with it
+## Stage 3: Live with it (superseded 2026-09-25)
 
-Use Kumite for one to two weeks before starting food tracking (0.2). Real use will expose what the spec missed, and fixes are cheaper before the food layer sits on top. Capture every bug and gap in the Parking lot, then plan 0.2 with the same spec, decisions, and tasks process.
+v0.1 was never installed. Stage 4 replaces this stage; see `docs/SPEC.md` for why.
+
+## Stage 4: Build version 0.2
+
+Same working rules as Stage 2: one task per branch, plan-mode review first, then typecheck, lint, tests, and build all passing, then Chris checks the Vercel preview on his phone before merging.
+
+### Task 4.1: Reset the docs (branch `feat/v0.2-plan`)
+
+- [x] Replace `docs/SPEC.md` with the v0.2 spec and add Stage 4 to this file.
+- [x] Mark v0.1 knee rules and the two home-screen questions as removed in Engine rules.
+- Done when: both files are merged to `main`.
+
+### Task 4.2: Nudge engine (branch `feat/nudge-engine`)
+
+- [ ] `src/engine/nudge.ts`: `pickNudge({ now, profile, history, lastNudge })` returning `null` or `{ kind, text, action, exerciseId?, reps?, url? }`, following the Reminders section of the spec and the Nudge rules below. Pure, like the rest of the engine.
+- [ ] Reuse `desk.ts` for the furthest-behind desk exercise and `day.ts` for fight, strength, and rest classification.
+- [ ] Migration `nudges_and_push`: `push_subscriptions` (`id`, `user_id`, `endpoint` unique, `p256dh`, `auth`, `user_agent`, `created_at`) and `nudge_log` (`id`, `user_id`, `kind`, `text`, `channel`, `sent_at`, `acted_at`), both with row-level security. `nudge_log` is append-only.
+- [ ] Table-driven tests for every rule in Nudge rules.
+- Done when: tests pass and the lint rule still confirms the engine imports nothing from React, Next, or Supabase.
+
+### Task 4.3: Web push (branch `feat/push`)
+
+- [ ] Generate a VAPID key pair once (`npx web-push generate-vapid-keys`). Chris adds `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, `VAPID_SUBJECT` (a mailto address), and `CRON_SECRET` to Vercel for Production and Preview. Only the public key ships to the browser, as `NEXT_PUBLIC_VAPID_PUBLIC_KEY`.
+- [ ] Service worker at `public/sw.js`: handles `push` (show the notification) and `notificationclick` (open the app at the nudge's URL).
+- [ ] Settings: an "Enable notifications" button that registers the service worker, requests permission, subscribes, and saves the subscription. Explain on screen that iOS needs the app installed to the home screen first.
+- [ ] Route `src/app/api/cron/nudge/route.ts`: rejects requests without the `CRON_SECRET` bearer token (Vercel sends it automatically), loads profile and history, calls `pickNudge`, sends through `web-push` to every subscription, records a `nudge_log` row, and deletes subscriptions that return 404 or 410 (expired).
+- [ ] `vercel.json` cron: `0 12-22 * * 1-5` (hourly, UTC, wide enough to cover 7:00 to 16:00 Central through both daylight and standard time; the route decides in local time whether anything is due) plus `30 23 * * *` for the evening catch-up and `0 1 * * 1` for the Sunday recap (Sunday 19:00 Central is Monday 00:00 or 01:00 UTC, so the route checks local time).
+- [ ] Nudge landing screen `src/app/do/page.tsx`: the exact set from the notification and one DONE button that writes a `desk_sets` row.
+- Done when: Chris enables notifications on the installed app, a nudge arrives at the top of the next hour, and tapping DONE moves the home screen bar.
+
+### Task 4.4: Peloton import (branch `feat/peloton-import`)
+
+- [ ] Chris adds `PELOTON_EMAIL` and `PELOTON_PASSWORD` to Vercel. Never logged, never in the browser, never in a chat.
+- [ ] `src/lib/peloton.ts`: sign in, list workouts since a date, fetch class detail. Server-only. Every call wrapped so a failure returns a typed error rather than throwing into a page.
+- [ ] Migration `peloton`: `sessions` gains `peloton_workout_id` (text, unique per user) and `peloton_class_id`; new table `peloton_classes` (`id`, `title`, `instructor`, `discipline`, `duration_min`, `body_focus`, `equipment`, `difficulty`, `url`, `fetched_at`); new table `peloton_sync` (`user_id`, `last_success_at`, `last_error`, `updated_at`).
+- [ ] Route `src/app/api/cron/peloton-sync/route.ts` on `0 8 * * *` UTC (3:00 Central), plus a sync button on the home screen. Rides become `ride` sessions with minutes, output, and calories; strength classes become `strength` sessions with `template = null`. Existing `peloton_workout_id` rows are skipped.
+- [ ] Home screen shows "Synced 4 h ago" or the last error.
+- Done when: Chris's last two weeks of Peloton rides and classes appear as sessions with no manual entry.
+
+### Task 4.5: Class recommender, collection stage (branch `feat/recommender`)
+
+- [ ] Migration `collection`: `class_picks` (`user_id`, `peloton_class_id`, `body_focus`, `duration_min`, `rating` -1 to 1, `added_at`).
+- [ ] Chris supplies 15 to 20 bookmarked classes; a settings screen lists them with body focus and duration editable.
+- [ ] `src/engine/recommend.ts`: `pickClass({ history, picks, minutes })` following the Recommender rules below. Tests.
+- [ ] Morning and evening nudges and the home screen use the pick, with the Peloton deep link.
+- [ ] Thumbs up or down on the home screen after an imported strength class updates `rating`.
+- Done when: two consecutive strength days get different body focuses and the link opens the class in the Peloton app.
+
+### Task 4.6: Home screen rewrite (branch `feat/home-v2`)
+
+- [ ] Replace `src/app/page.tsx`, `desk/`, and `gym/` with the single screen in the spec: today's one thing, desk bars with +N buttons, the week against quota, sync status, a "Fight day" toggle.
+- [ ] Remove the calibration gate. The fallback workout (`workout/[id]`) asks for a starting weight when an exercise has no logged set.
+- [ ] Remove knee-swap paths from the UI; the engine keeps the code switched off.
+- Done when: a fresh sign-in reaches a working home screen with no onboarding beyond profile and desk hours.
+
+### Task 4.7: Slack nudges (branch `feat/slack`)
+
+- [ ] Chris creates an incoming webhook in his personal Slack workspace and adds `SLACK_WEBHOOK_URL` to Vercel.
+- [ ] The nudge route posts desk nudges to Slack as well as push, with the same text and a link to the DONE screen.
+- Done when: an hourly nudge arrives in Slack and on the phone at the same minute.
+
+### Task 4.8: Sunday recap email (branch `feat/recap`)
+
+- [ ] Chris creates a Resend account, verifies a sending domain or uses the Resend test domain, and adds `RESEND_API_KEY` and `RECAP_TO_EMAIL` to Vercel.
+- [ ] `src/engine/recap.ts` builds the numbers (pure); a React Email template renders them; the cron route sends it.
+- Done when: Sunday's email shows the week's sessions against quota, weight trend, waist, and pull-up max.
+
+### Task 4.9: Release 0.2
+
+- [ ] Merge to `main`, tag `v0.2.0`, confirm the production deploy.
+- [ ] Chris installs the production app, enables notifications, and runs one week on it.
+- Done when: Chris has received a week of nudges and the Sunday email on production.
 
 ## Schema
 
@@ -156,7 +227,26 @@ Policies: config tables allow select, insert, and update on the user's own row. 
 
 ## Engine rules
 
-These are the precise, testable versions of the rules in `docs/SPEC.md`.
+Version 0.2 note (2026-09-25): the knee-swap rules, the recovery check, and the leg cap remain in the engine but are switched off and are not used anywhere in the UI. "At your desk?" and "Gym today?" no longer exist; a fight day is a logged or imported `fight` session that day, or the home-screen toggle.
+
+### Nudge rules (v0.2)
+
+- Local time is America/Chicago from `profile.timezone`. Weekday means Monday to Friday.
+- 07:00 daily: morning plan. Text is the day's one thing from `planDay()` plus the class pick when it is a strength day.
+- Hourly at :00 from 08:00 to 16:00 on weekdays: a desk nudge for the desk exercise furthest behind pace (the `desk.ts` rule), sized as a mini-set. Skipped when all desk targets are met, when a `fight` or `strength` session was logged in the last 60 minutes, or when a nudge of any kind was sent in the last 45 minutes. If a `desk_sets` row was logged in the last 20 minutes, pick the next exercise in the ranking instead.
+- On a fight day, desk targets are halved before pace is computed.
+- 18:30 daily: evening catch-up, only when the day is a strength day by `planDay()` and no `strength` session is logged today. Text names the shortest class pick (10 minutes) with its link.
+- Sunday 19:00: recap (email only; the nudge function returns `kind = "recap"` and the route builds the email).
+- Anything else returns `null`.
+
+### Recommender rules (v0.2)
+
+- Body focus rotation: if the last strength session in the log was upper, pick lower or full; if lower, pick upper or full; if full or none, pick upper.
+- Duration: `minutes` from the caller (20 by default, 10 on a squeeze day by the v0.1 rule, 30 when the week is on pace and the day is free). Choose the largest duration in the collection that is at most `minutes`.
+- Among candidates, exclude any class taken in the last 30 days, then prefer `rating = 1`, then least recently taken, then the collection order.
+- With no candidate after exclusions, drop the 30-day rule, then the duration rule, and pick again. Never return nothing when the collection is non-empty.
+
+The rules below are the v0.1 rules, kept for the fallback home workout and the pull-up ladder.
 
 ### Planning the day
 
