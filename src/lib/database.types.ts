@@ -87,39 +87,6 @@ export type Database = {
           },
         ]
       }
-      dev_notes: {
-        Row: {
-          addressed_in: string | null
-          app_version: string | null
-          body: string
-          created_at: string
-          id: string
-          screen: string | null
-          status: string
-          user_id: string
-        }
-        Insert: {
-          addressed_in?: string | null
-          app_version?: string | null
-          body: string
-          created_at?: string
-          id?: string
-          screen?: string | null
-          status?: string
-          user_id?: string
-        }
-        Update: {
-          addressed_in?: string | null
-          app_version?: string | null
-          body?: string
-          created_at?: string
-          id?: string
-          screen?: string | null
-          status?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       desk_sets: {
         Row: {
           created_at: string
@@ -177,6 +144,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dev_notes: {
+        Row: {
+          addressed_in: string | null
+          app_version: string | null
+          body: string
+          created_at: string
+          id: string
+          screen: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          addressed_in?: string | null
+          app_version?: string | null
+          body: string
+          created_at?: string
+          id?: string
+          screen?: string | null
+          status?: string
+          user_id?: string
+        }
+        Update: {
+          addressed_in?: string | null
+          app_version?: string | null
+          body?: string
+          created_at?: string
+          id?: string
+          screen?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       equipment: {
         Row: {
@@ -262,6 +262,33 @@ export type Database = {
         }
         Relationships: []
       }
+      nudge_log: {
+        Row: {
+          channel: string
+          id: string
+          kind: string
+          sent_at: string
+          text: string
+          user_id: string
+        }
+        Insert: {
+          channel: string
+          id?: string
+          kind: string
+          sent_at?: string
+          text: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          id?: string
+          kind?: string
+          sent_at?: string
+          text?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile: {
         Row: {
           baseline_weight_lb: number
@@ -307,6 +334,36 @@ export type Database = {
           user_id?: string
           work_end?: string
           work_start?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
