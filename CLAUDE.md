@@ -1,6 +1,6 @@
 # Kumite
 
-Kumite is a single-user workout and food tracker for Chris, installed on his phone as a web app. It suggests a workout that fits the time and equipment he has, logs every set, and progresses each exercise automatically. The goals: a body recomposition (about 10 lb more muscle and 10 lb less fat) and 10 strict pull-ups. Workouts are the core of the app; food tracking arrives in version 0.2.
+Kumite is a single-user workout and food tracker for Chris, installed on his phone as a web app. It reminds him to train (push and Slack nudges), picks a Peloton strength class for each strength day, tracks desk sets through the workday, and imports Peloton workouts automatically. The v0.1 dumbbell workout stays as a fallback. The goals: a body recomposition (about 10 lb more muscle and 10 lb less fat) and 10 strict pull-ups. Reminders and coached strength are the core; food tracking arrives in version 0.3.
 
 ## Read these first
 
@@ -30,7 +30,7 @@ These repo files are the source of truth. If SPEC and PLAN disagree, or a rule i
 ## Architecture rules
 
 1. The workout engine lives in `src/engine/` and is pure TypeScript. No React, Next, Supabase, network calls, or `Date.now()` inside it. The current time, settings, and log history are passed in as arguments, so the same inputs always produce the same output.
-2. No AI model is involved in workout logic. The only model use in the app is parsing typed food entries in version 0.2, on the server.
+2. No AI model is involved in workout or nudge logic. The only model use in the app is parsing typed food entries in version 0.3, on the server.
 3. Log tables (`sessions`, `sets`, `desk_sets`, `body_metrics`) are append-only. A correction is a new row whose `supersedes` column points at the row it replaces; a correction with `voided = true` cancels the old row instead. Current loads, ladder rungs, weekly set counts, streaks, and calorie estimates are computed when read and never stored.
 4. Row-level security is on for every table, and users only see and write their own rows. Log tables get no update or delete policies.
 5. Secrets live only in environment variables. Server-only values never get the `NEXT_PUBLIC_` prefix. Never commit `.env` files.

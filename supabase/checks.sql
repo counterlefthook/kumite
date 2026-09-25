@@ -27,7 +27,8 @@ begin
   execute 'set local role anon';
   perform set_config('request.jwt.claims', '', true);
   foreach t in array array['profile', 'equipment', 'exercises', 'sessions', 'sets', 'desk_sets',
-    'body_metrics', 'sessions_current', 'sets_current', 'desk_sets_current', 'body_metrics_current', 'dev_notes'] loop
+    'body_metrics', 'sessions_current', 'sets_current', 'desk_sets_current', 'body_metrics_current', 'dev_notes',
+    'push_subscriptions', 'nudge_log'] loop
     begin
       execute format('select count(*) from public.%I', t) into n;
       raise exception 'CHECK FAILED: signed-out read of % was allowed', t;
@@ -58,6 +59,14 @@ begin
   begin
     insert into public.dev_notes (body, status) values ('Sneaky', 'done');
     raise exception 'CHECK FAILED: adding an idea already marked done was allowed';
+  exception when insufficient_privilege then null;
+  end;
+  -- Reminders: a device can be added and removed; the nudge log is read-only for the app.
+  insert into public.push_subscriptions (endpoint, p256dh, auth) values ('https://push.example/abc', 'k1', 'k2');
+  delete from public.push_subscriptions where endpoint = 'https://push.example/abc';
+  begin
+    insert into public.nudge_log (user_id, kind, text, channel) values (u1, 'desk', '15 push-ups.', 'push');
+    raise exception 'CHECK FAILED: the app was allowed to write the nudge log';
   exception when insufficient_privilege then null;
   end;
   insert into public.equipment (dumbbell_settings_lb, bands)
